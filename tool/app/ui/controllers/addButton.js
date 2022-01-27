@@ -8,7 +8,7 @@
 
 ui.components = ui.components || {};  //prevents overriding the variable, while also preventing working with a null variable
 
-ui.components.createAddButtons = function() {
+ui.components.createAddButtons = function () {
     'use strict';
 
     //create the ADD buttons
@@ -23,8 +23,7 @@ ui.components.createAddButtons = function() {
             var image = elementType.name;
 
             new ui.components.AddButtonDropdownItemView({
-                attributes: {parent: '#add-actor-dropdown'},
-                model: new ui.components.AddButtonModel({
+                attributes: {parent: '#add-actor-dropdown'}, model: new ui.components.AddButtonModel({
                     action: ui.states.editor.ADDING.ADD_CONTAINER,
                     buttonImage: image,
                     defaultButtonImage: 'DefaultContainer.svg',
@@ -35,14 +34,182 @@ ui.components.createAddButtons = function() {
                 })
             }).render();
         });
-    }
-    else {
+
+        let positionX = 0
+        let positionY = 0
+
+        function nextPosition() {
+            positionX += 250
+            if (positionX > 500) {
+                positionX = 0
+                positionY += 150
+            }
+        }
+
+        function getTypeName(line) {
+            line = line.trim()
+            const type = line.split(' ')[0]
+            const name = line.substring(line.indexOf(' ') + 1, line.length)
+            return {type: type, name: name}
+        }
+
+        function addElement(type, name) {
+            name = name.trim()
+            switch (type) {
+                case 'Actor':
+                    istar.addActor(name, {position: {x: positionX, y: positionY}})
+                    nextPosition()
+                    break
+                case 'Agent':
+                    istar.addAgent(name, {position: {x: positionX, y: positionY}})
+                    nextPosition()
+                    break
+                case 'Role':
+                    istar.addRole(name, {position: {x: positionX, y: positionY}})
+                    nextPosition()
+                    break
+                default:
+                    ui.alert('INVALID: Sorry, but one of the actor you are trying to create is invalid');
+            }
+        }
+
+        let textModel = new ui.components.AddButtonModel({
+            action: ui.states.editor.ADDING.ADD_CONTAINER,
+            buttonImage: null,
+            defaultButtonImage: null,
+            label: 'Add by text',
+            name: '',
+            statusText: 'statusText',
+            tooltip: 'Add by text'
+        })
+        textModel.act = function (e) {
+            ui.prompt({
+                title: 'Add by text:',
+                value: '',
+                inputType: 'textarea',
+                placeholder: 'Actor name1\nAgent name2\nRole name3',
+                callback: function (value) {
+                    if (!value) return
+                    value = value.trim()
+                    let lines = value.split('\n')
+                    _.forEach(lines, function (line) {
+                        const type = getTypeName(line).type
+                        const name = getTypeName(line).name
+                        console.log(type, name)
+                        addElement(type, name)
+                    })
+                }
+            });
+        }
+        new ui.components.AddButtonDropdownItemView({
+            attributes: {parent: '#add-actor-dropdown'}, model: textModel
+        }).render();
+
+        let textModel2 = new ui.components.AddButtonModel({
+            action: ui.states.editor.ADDING.ADD_CONTAINER,
+            buttonImage: null,
+            defaultButtonImage: null,
+            label: 'Add by text2',
+            name: '',
+            statusText: 'statusText',
+            tooltip: 'Add by text2'
+        })
+        textModel2.act = function (e) {
+            ui.prompt({
+                title: 'Add by text:',
+                value: '',
+                inputType: 'textarea',
+                placeholder: 'Actor 3\nname1\nname2\nname3\n\nAgent 2\nname 1\nname 2\n\nRole 1\nname',
+                callback: function (value) {
+                    if (!value) return
+                    value = value.trim()
+                    let lines = value.split('\n')
+                    let cur = 0
+                    while (cur < lines.length) {
+                        if(!lines[cur]) {
+                            cur++
+                            continue
+                        }
+                        let type = lines[cur].split(' ')[0]
+                        let lineNum = parseInt(lines[cur].split(' ')[1])
+                        for (let i = 0; i < lineNum; i++) {
+                            cur++
+                            addElement(type, lines[cur])
+                        }
+                        cur++
+                    }
+                }
+            });
+        }
+        new ui.components.AddButtonDropdownItemView({
+            attributes: {parent: '#add-actor-dropdown'}, model: textModel2
+        }).render();
+
+        $("#d-add-by-text").click(function () {
+            textModel.act()
+        })
+
+        $("#d-add-by-text2").click(function () {
+            textModel2.act()
+        })
+
+        $("#d-add-actor-by-text").click(function () {
+            ui.prompt({
+                title: 'Add by text:',
+                value: '',
+                inputType: 'textarea',
+                placeholder: 'name1\nname2\nname3\n',
+                callback: function (value) {
+                    if (!value) return
+                    value = value.trim()
+                    let lines = value.split('\n')
+                    _.forEach(lines, function (line) {
+                        addElement('Actor', line)
+                    })
+                }
+            });
+        })
+
+        $("#d-add-agent-by-text").click(function () {
+            ui.prompt({
+                title: 'Add by text:',
+                value: '',
+                inputType: 'textarea',
+                placeholder: 'name1\nname2\nname3\n',
+                callback: function (value) {
+                    if (!value) return
+                    value = value.trim()
+                    let lines = value.split('\n')
+                    _.forEach(lines, function (line) {
+                        addElement('Agent', line)
+                    })
+                }
+            });
+        })
+
+        $("#d-add-role-by-text").click(function () {
+            ui.prompt({
+                title: 'Add by text:',
+                value: '',
+                inputType: 'textarea',
+                placeholder: 'name1\nname2\nname3\n',
+                callback: function (value) {
+                    if (!value) return
+                    value = value.trim()
+                    let lines = value.split('\n')
+                    _.forEach(lines, function (line) {
+                        addElement('Role', line)
+                    })
+                }
+            });
+        })
+    } else {
         $('#menu-dropdown-actors').hide();
     }
 
     //create Add <<ContainerLink>> buttons
     if (istar.metamodel.containerLinks) {
-        _.forEach(istar.metamodel.containerLinks, function(linkType) {
+        _.forEach(istar.metamodel.containerLinks, function (linkType) {
             //if specific ui elements are not defined, use default ones
             var label = linkType.buttonLabel || (linkType.name);
             var tooltip = linkType.buttonTooltip || ('Add a ' + linkType.name);
@@ -50,8 +217,7 @@ ui.components.createAddButtons = function() {
             var image = linkType.name;
 
             new ui.components.AddButtonDropdownItemView({
-                attributes: {parent: '#add-actor-link-dropdown'},
-                model: new ui.components.AddButtonModel({
+                attributes: {parent: '#add-actor-link-dropdown'}, model: new ui.components.AddButtonModel({
                     action: ui.states.editor.ADDING.ADD_LINK,
                     buttonImage: image,
                     defaultButtonImage: 'DefaultContainerLink.svg',
@@ -62,15 +228,14 @@ ui.components.createAddButtons = function() {
                 })
             }).render();
         });
-    }
-    else {
+    } else {
         $('#menu-dropdown-actor-links').hide();
     }
 
     //create Add <<DependencyLink>> buttons
     var hasDependency = false;
-    _.forEach(istar.metamodel.nodes, function(elementType) {
-        if (elementType.canBeDependum ) {
+    _.forEach(istar.metamodel.nodes, function (elementType) {
+        if (elementType.canBeDependum) {
             hasDependency = true;
 
             //if specific ui elements are not defined, use default ones
@@ -80,8 +245,7 @@ ui.components.createAddButtons = function() {
             var image = elementType.name + 'DependencyLink';
 
             new ui.components.AddButtonDropdownItemView({
-                attributes: {parent: '#add-dependency-dropdown'},
-                model: new ui.components.AddButtonModel({
+                attributes: {parent: '#add-dependency-dropdown'}, model: new ui.components.AddButtonModel({
                     action: ui.states.editor.ADDING.ADD_LINK,
                     buttonImage: image,
                     defaultButtonImage: 'DefaultDependencyLink.svg',
@@ -93,13 +257,13 @@ ui.components.createAddButtons = function() {
             }).render();
         }
     });
-    if (! hasDependency) {
+    if (!hasDependency) {
         $('#menu-dropdown-dependency-links').hide();
     }
 
 
     //create Add <<Element>> buttons
-    _.forEach(istar.metamodel.nodes, function(elementType) {
+    _.forEach(istar.metamodel.nodes, function (elementType) {
         if (elementType.canBeInnerElement || elementType.canBeOnPaper) {
 
             //if specific ui elements are not defined, use default ones
@@ -121,7 +285,7 @@ ui.components.createAddButtons = function() {
     });
 
     //create Add <<NodeLink>> buttons
-    _.forEach(istar.metamodel.nodeLinks, function(linkType) {
+    _.forEach(istar.metamodel.nodeLinks, function (linkType) {
         if (linkType.canBeManuallyAdded !== false) {
             if (linkType.changeableLabel) {
                 //create a dropdown button and then create a dropdown item for each possible value of the label
