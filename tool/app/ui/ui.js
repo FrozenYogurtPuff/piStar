@@ -19,6 +19,7 @@ var ui = function() {
                     ADD_CONTAINER: 101,
                     ADD_NODE: 102,
                     ADD_LINK: 103,
+                    ADD_BY_TEXT: 104,
                     data: {
                         button: null, /* the 'add button' that is currently selected */
                         typeNameToAdd: null, /* the name of the type that is to be added */
@@ -274,6 +275,11 @@ ui.defineInteractions = function () {
                     x: x - bbox.width/2,
                     y: y - bbox.height/2
                 }});
+        }
+        if (ui.states.editor.current === ui.states.editor.ADDING.ADD_BY_TEXT) {
+            ui.setInitPosition(x, y)
+            ui.addElements()
+            ui.clearElements()
         }
     });
 

@@ -37,11 +37,22 @@ ui.components.createAddButtons = function () {
 
         let positionX = 0
         let positionY = 0
+        let initX = 0
+        let initY = 0
+
+        ui.setInitPosition = function setInitPosition(x, y) {
+            positionX = x
+            positionY = y
+            initX = x
+            initY = y
+        }
 
         function nextPosition() {
+            let number = elementsToAdd.length
+            let col = Math.ceil(Math.sqrt(number))
             positionX += 250
-            if (positionX > 500) {
-                positionX = 0
+            if (positionX > initX + (col - 1) * 250) {
+                positionX = initX
                 positionY += 150
             }
         }
@@ -51,6 +62,14 @@ ui.components.createAddButtons = function () {
             const type = line.split(' ')[0]
             const name = line.substring(line.indexOf(' ') + 1, line.length)
             return {type: type, name: name}
+        }
+
+        function setAddState() {
+            ui.selectPaper();
+            ui.states.editor.current = ui.states.editor.ADDING.ADD_BY_TEXT
+            $('#diagram').css('cursor', 'crosshair');
+            $('#diagram g').css('cursor', 'no-drop');
+            $('#diagram .actorKindMain').css('cursor', 'no-drop');
         }
 
         function addElement(type, name) {
@@ -73,13 +92,28 @@ ui.components.createAddButtons = function () {
             }
         }
 
+        let elementsToAdd = []
+
+        ui.addElements = function addElements() {
+            _.forEach(elementsToAdd, function (element) {
+                addElement(element.type, element.name)
+            })
+        }
+
+        ui.clearElements = function () {
+            elementsToAdd = []
+            ui.states.editor.transitionTo(ui.states.editor.VIEWING);
+            ui.resetPointerStyles();
+            ui.changeAddMenuStatus('')
+        }
+
         let textModel = new ui.components.AddButtonModel({
             action: ui.states.editor.ADDING.ADD_CONTAINER,
             buttonImage: null,
             defaultButtonImage: null,
             label: 'Add by text',
             name: '',
-            statusText: 'statusText',
+            statusText: 'Add multiple Actors by text: click on empty space in diagram to add multiple Actors',
             tooltip: 'Add by text'
         })
         textModel.act = function (e) {
@@ -89,15 +123,20 @@ ui.components.createAddButtons = function () {
                 inputType: 'textarea',
                 placeholder: 'Actor name1\nAgent name2\nRole name3',
                 callback: function (value) {
-                    if (!value) return
+                    if (!value) {
+                        ui.clearElements();
+                        return;
+                    }
                     value = value.trim()
                     let lines = value.split('\n')
                     _.forEach(lines, function (line) {
                         const type = getTypeName(line).type
                         const name = getTypeName(line).name
                         console.log(type, name)
-                        addElement(type, name)
+                        elementsToAdd.push({type, name})
+                        // addElement(type, name)
                     })
+                    setAddState();
                 }
             });
         }
@@ -111,7 +150,7 @@ ui.components.createAddButtons = function () {
             defaultButtonImage: null,
             label: 'Add by text2',
             name: '',
-            statusText: 'statusText',
+            statusText: 'Add multiple Actors by text: click on empty space in diagram to add multiple Actors',
             tooltip: 'Add by text2'
         })
         textModel2.act = function (e) {
@@ -121,23 +160,28 @@ ui.components.createAddButtons = function () {
                 inputType: 'textarea',
                 placeholder: 'Actor 3\nname1\nname2\nname3\n\nAgent 2\nname 1\nname 2\n\nRole 1\nname',
                 callback: function (value) {
-                    if (!value) return
+                    if (!value) {
+                        ui.clearElements();
+                        return;
+                    }
                     value = value.trim()
                     let lines = value.split('\n')
                     let cur = 0
                     while (cur < lines.length) {
-                        if(!lines[cur]) {
+                        if (!lines[cur]) {
                             cur++
                             continue
                         }
                         let type = lines[cur].split(' ')[0]
-                        let lineNum = parseInt(lines[cur].split(' ')[1])
+                        let lineNum = parseInt(lines[cur].split(' ')[1]) || 1
                         for (let i = 0; i < lineNum; i++) {
                             cur++
-                            addElement(type, lines[cur])
+                            // addElement(type, lines[cur])
+                            elementsToAdd.push({type: type, name: lines[cur]})
                         }
                         cur++
                     }
+                    setAddState();
                 }
             });
         }
@@ -164,8 +208,10 @@ ui.components.createAddButtons = function () {
                     value = value.trim()
                     let lines = value.split('\n')
                     _.forEach(lines, function (line) {
-                        addElement('Actor', line)
+                        // addElement('Actor', line)
+                        elementsToAdd.push({type: 'Actor', name: line})
                     })
+                    setAddState();
                 }
             });
         })
@@ -181,8 +227,9 @@ ui.components.createAddButtons = function () {
                     value = value.trim()
                     let lines = value.split('\n')
                     _.forEach(lines, function (line) {
-                        addElement('Agent', line)
+                        elementsToAdd.push({type: 'Agent', name: line})
                     })
+                    setAddState();
                 }
             });
         })
@@ -198,8 +245,9 @@ ui.components.createAddButtons = function () {
                     value = value.trim()
                     let lines = value.split('\n')
                     _.forEach(lines, function (line) {
-                        addElement('Role', line)
+                        elementsToAdd.push({type: 'Role', name: line})
                     })
+                    setAddState()
                 }
             });
         })
