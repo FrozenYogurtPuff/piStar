@@ -73,23 +73,36 @@ ui.components.createAddButtons = function () {
         }
 
         function addElement(type, name) {
-            name = name.trim()
-            switch (type) {
-                case 'Actor':
-                    istar.addActor(name, {position: {x: positionX, y: positionY}})
-                    nextPosition()
-                    break
-                case 'Agent':
-                    istar.addAgent(name, {position: {x: positionX, y: positionY}})
-                    nextPosition()
-                    break
-                case 'Role':
-                    istar.addRole(name, {position: {x: positionX, y: positionY}})
-                    nextPosition()
-                    break
-                default:
-                    ui.alert('INVALID: Sorry, but one of the actor you are trying to create is invalid');
+            try {
+                name = name.trim()
+                let r;
+                switch (type) {
+                    case 'Actor':
+                        r = istar.addActor(name, {position: {x: positionX, y: positionY}})
+                        nextPosition()
+                        break
+                    case 'Agent':
+                        r = istar.addAgent(name, {position: {x: positionX, y: positionY}})
+                        nextPosition()
+                        break
+                    case 'Role':
+                        r = istar.addRole(name, {position: {x: positionX, y: positionY}})
+                        nextPosition()
+                        break
+                    default:
+                        ui.alert('INVALID: Sorry, but one of the actor you are trying to create is invalid');
+                        break
+                }
+                if (r) {
+                    istar.resizePaperBasedOnCell(r)
+                }
+            } catch (e) {
+                console.error(e)
+                console.log(e)
+                ui.alert('INVALID: Sorry, but one of the actor you are trying to create is invalid');
+                ui.clearElements();
             }
+
         }
 
         let elementsToAdd = []
@@ -127,16 +140,22 @@ ui.components.createAddButtons = function () {
                         ui.clearElements();
                         return;
                     }
-                    value = value.trim()
-                    let lines = value.split('\n')
-                    _.forEach(lines, function (line) {
-                        const type = getTypeName(line).type
-                        const name = getTypeName(line).name
-                        console.log(type, name)
-                        elementsToAdd.push({type, name})
-                        // addElement(type, name)
-                    })
-                    setAddState();
+                    try {
+                        value = value.trim()
+                        let lines = value.split('\n')
+                        _.forEach(lines, function (line) {
+                            const type = getTypeName(line).type
+                            const name = getTypeName(line).name
+                            console.log(type, name)
+                            elementsToAdd.push({type, name})
+                            // addElement(type, name)
+                        })
+                        setAddState();
+                    } catch (e) {
+                        console.log(e)
+                        ui.alert('INVALID: Sorry, but one of the actor you are trying to create is invalid');
+                        ui.clearElements();
+                    }
                 }
             });
         }
@@ -164,24 +183,30 @@ ui.components.createAddButtons = function () {
                         ui.clearElements();
                         return;
                     }
-                    value = value.trim()
-                    let lines = value.split('\n')
-                    let cur = 0
-                    while (cur < lines.length) {
-                        if (!lines[cur]) {
+                    try {
+                        value = value.trim()
+                        let lines = value.split('\n')
+                        let cur = 0
+                        while (cur < lines.length) {
+                            if (!lines[cur]) {
+                                cur++
+                                continue
+                            }
+                            let type = lines[cur].split(' ')[0]
+                            let lineNum = parseInt(lines[cur].split(' ')[1]) || 1
+                            for (let i = 0; i < lineNum; i++) {
+                                cur++
+                                // addElement(type, lines[cur])
+                                elementsToAdd.push({type: type, name: lines[cur]})
+                            }
                             cur++
-                            continue
                         }
-                        let type = lines[cur].split(' ')[0]
-                        let lineNum = parseInt(lines[cur].split(' ')[1]) || 1
-                        for (let i = 0; i < lineNum; i++) {
-                            cur++
-                            // addElement(type, lines[cur])
-                            elementsToAdd.push({type: type, name: lines[cur]})
-                        }
-                        cur++
+                        setAddState();
+                    } catch (e) {
+                        console.log(e)
+                        ui.alert('INVALID: Sorry, but one of the actor you are trying to create is invalid');
+                        ui.clearElements();
                     }
-                    setAddState();
                 }
             });
         }
