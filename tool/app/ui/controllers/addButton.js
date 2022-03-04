@@ -214,17 +214,18 @@ ui.components.createAddButtons = function () {
             attributes: {parent: '#add-actor-dropdown'}, model: textModel2
         }).render();
 
-        $("#d-add-by-text").click(function () {
-            textModel.act()
+        let addActorByTextModel = new ui.components.AddButtonModel({
+            action: ui.states.editor.ADDING.ADD_CONTAINER,
+            buttonImage: null,
+            defaultButtonImage: null,
+            label: 'Add Actor by text',
+            name: '',
+            statusText: 'Add multiple Actors by text: click on empty space in diagram to add multiple Actors',
+            tooltip: 'Add Actor by text'
         })
-
-        $("#d-add-by-text2").click(function () {
-            textModel2.act()
-        })
-
-        $("#d-add-actor-by-text").click(function () {
+        addActorByTextModel.act = function (e) {
             ui.prompt({
-                title: 'Add by text:',
+                title: 'Add Actor by text:',
                 value: '',
                 inputType: 'textarea',
                 placeholder: 'name1\nname2\nname3\n',
@@ -239,11 +240,23 @@ ui.components.createAddButtons = function () {
                     setAddState();
                 }
             });
-        })
+        }
+        new ui.components.AddButtonDropdownItemView({
+            attributes: {parent: '#add-actor-dropdown'}, model: addActorByTextModel
+        }).render();
 
-        $("#d-add-agent-by-text").click(function () {
+        let addAgentByTextModel = new ui.components.AddButtonModel({
+            action: ui.states.editor.ADDING.ADD_CONTAINER,
+            buttonImage: null,
+            defaultButtonImage: null,
+            label: 'Add Agent by text',
+            name: '',
+            statusText: 'Add multiple Agents by text: click on empty space in diagram to add multiple Agents',
+            tooltip: 'Add Agent by text'
+        })
+        addAgentByTextModel.act = function (e) {
             ui.prompt({
-                title: 'Add by text:',
+                title: 'Add Agent by text:',
                 value: '',
                 inputType: 'textarea',
                 placeholder: 'name1\nname2\nname3\n',
@@ -257,11 +270,23 @@ ui.components.createAddButtons = function () {
                     setAddState();
                 }
             });
-        })
+        }
+        new ui.components.AddButtonDropdownItemView({
+            attributes: {parent: '#add-actor-dropdown'}, model: addAgentByTextModel
+        }).render();
 
-        $("#d-add-role-by-text").click(function () {
+        let addRoleByTextModel = new ui.components.AddButtonModel({
+            action: ui.states.editor.ADDING.ADD_CONTAINER,
+            buttonImage: null,
+            defaultButtonImage: null,
+            label: 'Add Role by text',
+            name: '',
+            statusText: 'Add multiple Roles by text: click on empty space in diagram to add multiple Roles',
+            tooltip: 'Add Role by text'
+        })
+        addRoleByTextModel.act = function (e) {
             ui.prompt({
-                title: 'Add by text:',
+                title: 'Add Role by text:',
                 value: '',
                 inputType: 'textarea',
                 placeholder: 'name1\nname2\nname3\n',
@@ -275,7 +300,10 @@ ui.components.createAddButtons = function () {
                     setAddState()
                 }
             });
-        })
+        }
+        new ui.components.AddButtonDropdownItemView({
+            attributes: {parent: '#add-actor-dropdown'}, model: addRoleByTextModel
+        }).render();
     } else {
         $('#menu-dropdown-actors').hide();
     }
