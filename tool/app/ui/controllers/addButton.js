@@ -98,7 +98,6 @@ ui.components.createAddButtons = function () {
                 }
             } catch (e) {
                 console.error(e)
-                console.log(e)
                 ui.alert('INVALID: Sorry, but one of the actor you are trying to create is invalid');
                 ui.clearElements();
             }
@@ -123,7 +122,7 @@ ui.components.createAddButtons = function () {
         let textModel = new ui.components.AddButtonModel({
             action: ui.states.editor.ADDING.ADD_CONTAINER,
             buttonImage: null,
-            defaultButtonImage: null,
+            defaultButtonImage: 'DefaultContainer.svg',
             label: 'Add by text',
             name: '',
             statusText: 'Add multiple Actors by text: click on empty space in diagram to add multiple Actors',
@@ -166,7 +165,7 @@ ui.components.createAddButtons = function () {
         let textModel2 = new ui.components.AddButtonModel({
             action: ui.states.editor.ADDING.ADD_CONTAINER,
             buttonImage: null,
-            defaultButtonImage: null,
+            defaultButtonImage: 'DefaultContainer.svg',
             label: 'Add by text2',
             name: '',
             statusText: 'Add multiple Actors by text: click on empty space in diagram to add multiple Actors',
@@ -201,7 +200,7 @@ ui.components.createAddButtons = function () {
                             }
                             cur++
                         }
-                        setAddState();
+                        setAddState('actor');
                     } catch (e) {
                         console.log(e)
                         ui.alert('INVALID: Sorry, but one of the actor you are trying to create is invalid');
@@ -216,8 +215,8 @@ ui.components.createAddButtons = function () {
 
         let addActorByTextModel = new ui.components.AddButtonModel({
             action: ui.states.editor.ADDING.ADD_CONTAINER,
-            buttonImage: null,
-            defaultButtonImage: null,
+            buttonImage: 'Actor',
+            defaultButtonImage: 'DefaultContainer.svg',
             label: 'Add Actor by text',
             name: '',
             statusText: 'Add multiple Actors by text: click on empty space in diagram to add multiple Actors',
@@ -247,8 +246,8 @@ ui.components.createAddButtons = function () {
 
         let addAgentByTextModel = new ui.components.AddButtonModel({
             action: ui.states.editor.ADDING.ADD_CONTAINER,
-            buttonImage: null,
-            defaultButtonImage: null,
+            buttonImage: 'Agent',
+            defaultButtonImage: 'DefaultContainer.svg',
             label: 'Add Agent by text',
             name: '',
             statusText: 'Add multiple Agents by text: click on empty space in diagram to add multiple Agents',
@@ -277,8 +276,8 @@ ui.components.createAddButtons = function () {
 
         let addRoleByTextModel = new ui.components.AddButtonModel({
             action: ui.states.editor.ADDING.ADD_CONTAINER,
-            buttonImage: null,
-            defaultButtonImage: null,
+            buttonImage: 'Role',
+            defaultButtonImage: 'DefaultContainer.svg',
             label: 'Add Role by text',
             name: '',
             statusText: 'Add multiple Roles by text: click on empty space in diagram to add multiple Roles',
@@ -358,6 +357,133 @@ ui.components.createAddButtons = function () {
             }).render();
         }
     });
+
+    function addElement(type, name, x, y) {
+        try {
+            name = name.trim()
+            let r;
+            switch (type) {
+                case 'Actor':
+                    r = istar.addActor(name, {position: {x: x, y: y}})
+                    break
+                case 'Agent':
+                    r = istar.addAgent(name, {position: {x: x, y: y}})
+                    break
+                case 'Role':
+                    r = istar.addRole(name, {position: {x: x, y: y}})
+                    break
+                default:
+                    ui.alert('INVALID: Sorry, but one of the actor you are trying to create is invalid');
+                    break
+            }
+            if (r) {
+                istar.resizePaperBasedOnCell(r)
+            }
+            return r;
+        } catch (e) {
+            console.error(e)
+            ui.alert('INVALID: Sorry, but one of the actor you are trying to create is invalid');
+            ui.clearElements();
+        }
+
+    }
+
+    function listAllActors() {
+        let allActors = []
+        const Actors = new Set(['Agent', 'Role', 'Actor'])
+        _.map(istar.getElements(), function(node) {
+            if (Actors.has(node.prop('type'))) {
+                allActors.push(node)
+            }
+        });
+        console.log(allActors)
+        return allActors
+    }
+
+    let type1, name1, type2, name2, lines, linenum
+
+    ui.addLinkByText = function (x, y) {
+        const actor1 = addElement(type1, name1, x, y);
+        const actor2 = addElement(type2, name2, x + 250, y);
+        let depx = 10, depy = 10;
+        for (let i = 2; i < linenum; i++) {
+            let dType = lines[i].split(': ')[0]
+            let dName = lines[i].substring(lines[i].indexOf(': ') + 2)
+            // console.log(dType, dName, depx, depy)
+            ui.addDependencyWithName(actor1, dType + 'DependencyLink', actor2, dName, depx, depy)
+            depx += 100
+            depy += 100
+        }
+        type1 = ""
+        name1 = ""
+        type2 = ""
+        name2 = ""
+        lines = []
+        linenum = ""
+        ui.states.editor.transitionTo(ui.states.editor.VIEWING);
+        ui.resetPointerStyles();
+        ui.changeAddMenuStatus('')
+    }
+
+    let addDependencyByTextModel = new ui.components.AddButtonModel({
+        action: ui.states.editor.ADDING.ADD_LINK,
+        buttonImage: null,
+        defaultButtonImage: 'DefaultDependencyLink.svg',
+        label: 'Add Dependency by text',
+        name: '',
+        statusText: 'statusText',
+        tooltip: 'Add Dependency by text'
+    })
+    addDependencyByTextModel.act = function (e) {
+        ui.prompt({
+            title: 'Add Dependency by text:',
+            value: '',
+            inputType: 'textarea',
+            placeholder: '<type> A depends on <type> B\n' +
+                'On:\n' +
+                '<type>: <name>\n' +
+                '...',
+            callback: function (value) {
+                if (!value) return
+                value = value.trim()
+                lines = value.split('\n')
+                const line1 = lines[0].split(' depends on ')
+                linenum = lines.length
+                type1 = line1[0].substring(0, line1[0].indexOf(' '))
+                name1 = line1[0].substring(line1[0].indexOf(' ') + 1)
+                type2 = line1[1].substring(0, line1[1].indexOf(' '))
+                name2 = line1[1].substring(line1[1].indexOf(' ') + 1)
+                // console.log(type1, name1, type2, name2)
+                const allActors = listAllActors();
+                let existFlag = false;
+                _.forEach(allActors, function(actor) {
+                    if (name1 === actor.prop('name')) {
+                        console.log('name1 exist')
+                        existFlag = true;
+                    }
+                    if (name2 === actor.prop('name')) {
+                        console.log('name2 exist')
+                        existFlag = true;
+                    }
+                });
+                if (!existFlag) {
+                    ui.selectPaper();
+                    ui.states.editor.current = ui.states.editor.ADDING.ADD_LINK_BY_TEXT
+                    $('#diagram').css('cursor', 'crosshair');
+                    $('#diagram g').css('cursor', 'no-drop');
+                    $('#diagram .actorKindMain').css('cursor', 'no-drop');
+                } else {
+                    console.log('one of the name exist, aborted...')
+                    // TODO: duplicate name
+                }
+            }
+        });
+    }
+    new ui.components.AddButtonDropdownItemView({
+        attributes: {parent: '#add-dependency-dropdown'},
+        model: addDependencyByTextModel
+    }).render();
+
     if (!hasDependency) {
         $('#menu-dropdown-dependency-links').hide();
     }

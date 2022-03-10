@@ -20,6 +20,7 @@ var ui = function() {
                     ADD_NODE: 102,
                     ADD_LINK: 103,
                     ADD_BY_TEXT: 104,
+                    ADD_LINK_BY_TEXT: 105,
                     data: {
                         button: null, /* the 'add button' that is currently selected */
                         typeNameToAdd: null, /* the name of the type that is to be added */
@@ -280,6 +281,9 @@ ui.defineInteractions = function () {
             ui.setInitPosition(x, y)
             ui.addElements()
             ui.clearElements()
+        }
+        if (ui.states.editor.current === ui.states.editor.ADDING.ADD_LINK_BY_TEXT) {
+            ui.addLinkByText(x, y)
         }
     });
 
@@ -710,6 +714,27 @@ ui.addDependency = function (source, dependencyType, target) {
 
     var dependumType = dependencyType.replace('DependencyLink', '');
     node = istar['add' + dependumType](text, position);
+
+    var links = istar.addDependency(source, node, target);
+    links[0].on('change:vertices', ui._toggleSmoothness);
+    links[1].on('change:vertices', ui._toggleSmoothness);
+
+    ui.setupDependencyRemoval(links);
+
+    node.prop('customProperties/Description', '');
+    ui.selectCell(node);
+}
+
+ui.addDependencyWithName = function (source, dependencyType, target, name, x, y) {
+    'use strict';
+
+    var node = '';
+    var position = {x: x, y: y};
+    var text = name;
+
+    var dependumType = dependencyType.replace('DependencyLink', '');
+    node = istar['add' + dependumType](text, position);
+    console.log(dependumType)
 
     var links = istar.addDependency(source, node, target);
     links[0].on('change:vertices', ui._toggleSmoothness);
