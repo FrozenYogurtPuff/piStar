@@ -529,7 +529,6 @@ var istar = function () {
             return link;
         },
         addDependency: function (depender, dependum, dependee) {
-            console.log('use 2')
             var shape = joint.shapes.istar.DependencyLink;
             var hasShape = true;
             if (!shape) {

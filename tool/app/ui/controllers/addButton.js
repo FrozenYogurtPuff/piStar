@@ -391,25 +391,21 @@ ui.components.createAddButtons = function () {
     function listAllActors() {
         let allActors = []
         const Actors = new Set(['Agent', 'Role', 'Actor'])
-        _.map(istar.getElements(), function(node) {
+        _.map(istar.getElements(), function (node) {
             if (Actors.has(node.prop('type'))) {
                 allActors.push(node)
             }
         });
-        console.log(allActors)
         return allActors
     }
 
     let type1, name1, type2, name2, lines, linenum
 
-    ui.addLinkByText = function (x, y) {
-        const actor1 = addElement(type1, name1, x, y);
-        const actor2 = addElement(type2, name2, x + 250, y);
+    function addDependencyByText(actor1, actor2) {
         let depx = 10, depy = 10;
         for (let i = 2; i < linenum; i++) {
             let dType = lines[i].split(': ')[0]
             let dName = lines[i].substring(lines[i].indexOf(': ') + 2)
-            // console.log(dType, dName, depx, depy)
             ui.addDependencyWithName(actor1, dType + 'DependencyLink', actor2, dName, depx, depy)
             depx += 100
             depy += 100
@@ -419,10 +415,44 @@ ui.components.createAddButtons = function () {
         type2 = ""
         name2 = ""
         lines = []
-        linenum = ""
+        linenum = 0
+    }
+
+    ui.addLinkByText = function (x, y) {
+        const actor1 = addElement(type1, name1, x, y);
+        const actor2 = addElement(type2, name2, x + 250, y);
+        addDependencyByText(actor1, actor2);
         ui.states.editor.transitionTo(ui.states.editor.VIEWING);
         ui.resetPointerStyles();
         ui.changeAddMenuStatus('')
+    }
+
+    function tryAddActors(type1, name1, type2, name2) {
+        const allActors = listAllActors();
+        let js1 = 0, js2 = 0;
+        let actor1, actor2;
+        _.forEach(allActors, function (actor) {
+            if (name1 === actor.prop('name') && type1 === actor.prop('type')) {
+                js1++
+                actor1 = actor
+            }
+            if (name2 === actor.prop('name') && type2 === actor.prop('type')) {
+                js2++
+                actor2 = actor
+            }
+        });
+        if (js1 === 1 && js2 === 1) {
+            addDependencyByText(actor1, actor2)
+        } else if (js1 === 0 && js2 === 0) {
+            ui.selectPaper();
+            ui.states.editor.current = ui.states.editor.ADDING.ADD_LINK_BY_TEXT
+            $('#diagram').css('cursor', 'crosshair');
+            $('#diagram g').css('cursor', 'no-drop');
+            $('#diagram .actorKindMain').css('cursor', 'no-drop');
+        } else {
+            ui.alert('Duplicate Actors.');
+            // TODO: duplicate name
+        }
     }
 
     let addDependencyByTextModel = new ui.components.AddButtonModel({
@@ -453,29 +483,7 @@ ui.components.createAddButtons = function () {
                 name1 = line1[0].substring(line1[0].indexOf(' ') + 1)
                 type2 = line1[1].substring(0, line1[1].indexOf(' '))
                 name2 = line1[1].substring(line1[1].indexOf(' ') + 1)
-                // console.log(type1, name1, type2, name2)
-                const allActors = listAllActors();
-                let existFlag = false;
-                _.forEach(allActors, function(actor) {
-                    if (name1 === actor.prop('name')) {
-                        console.log('name1 exist')
-                        existFlag = true;
-                    }
-                    if (name2 === actor.prop('name')) {
-                        console.log('name2 exist')
-                        existFlag = true;
-                    }
-                });
-                if (!existFlag) {
-                    ui.selectPaper();
-                    ui.states.editor.current = ui.states.editor.ADDING.ADD_LINK_BY_TEXT
-                    $('#diagram').css('cursor', 'crosshair');
-                    $('#diagram g').css('cursor', 'no-drop');
-                    $('#diagram .actorKindMain').css('cursor', 'no-drop');
-                } else {
-                    console.log('one of the name exist, aborted...')
-                    // TODO: duplicate name
-                }
+                tryAddActors(type1, name1, type2, name2)
             }
         });
     }

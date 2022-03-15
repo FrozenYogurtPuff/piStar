@@ -734,7 +734,6 @@ ui.addDependencyWithName = function (source, dependencyType, target, name, x, y)
 
     var dependumType = dependencyType.replace('DependencyLink', '');
     node = istar['add' + dependumType](text, position);
-    console.log(dependumType)
 
     var links = istar.addDependency(source, node, target);
     links[0].on('change:vertices', ui._toggleSmoothness);
