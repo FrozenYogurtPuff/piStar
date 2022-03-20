@@ -21,6 +21,8 @@ var ui = function() {
                     ADD_LINK: 103,
                     ADD_BY_TEXT: 104,
                     ADD_LINK_BY_TEXT: 105,
+                    ADD_LINK_BY_TEXT_ACTOR_1: 106,
+                    ADD_LINK_BY_TEXT_ACTOR_2: 107,
                     data: {
                         button: null, /* the 'add button' that is currently selected */
                         typeNameToAdd: null, /* the name of the type that is to be added */
@@ -284,6 +286,12 @@ ui.defineInteractions = function () {
         }
         if (ui.states.editor.current === ui.states.editor.ADDING.ADD_LINK_BY_TEXT) {
             ui.addLinkByText(x, y)
+        }
+        if (ui.states.editor.current === ui.states.editor.ADDING.ADD_LINK_BY_TEXT_ACTOR_1) {
+            ui.addLinkByTextOneActor(1, x, y)
+        }
+        if (ui.states.editor.current === ui.states.editor.ADDING.ADD_LINK_BY_TEXT_ACTOR_2) {
+            ui.addLinkByTextOneActor(2, x, y)
         }
     });
 

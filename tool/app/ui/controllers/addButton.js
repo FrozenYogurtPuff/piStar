@@ -399,14 +399,54 @@ ui.components.createAddButtons = function () {
         return allActors
     }
 
+    function isNodeDuplicate(actor1, actor2, type, name) {
+        const Dependencies = new Set(['Goal', 'Quality', 'Resource', 'Task'])
+        return new Promise((resolve, reject) => {
+            _.map(istar.getElements(), function (node) {
+                if (Dependencies.has(node.prop('type'))) {
+                    if (node.prop('type') === type && node.prop('name') === name) {
+                        const neighbours = istar.graph.getNeighbors(node);
+                        let neighboursID = []
+                        for (let i = 0; i < neighbours.length; i++) {
+                            neighboursID.push(neighbours[i].prop('id'))
+                        }
+                        if (neighboursID.includes(actor1.prop('id')) && neighboursID.includes(actor2.prop('id'))) {
+                            resolve(true)
+                        }
+                    }
+                }
+            })
+            resolve(false)
+        })
+    }
+
     let type1, name1, type2, name2, lines, linenum
+    let actor1, actor2
+
+    function getActorByNameType(type, name) {
+        const allActors = listAllActors();
+        let actors = [];
+        _.forEach(allActors, function (actor) {
+            if (name === actor.prop('name') && type === actor.prop('type')) {
+                actors.push(actor)
+            }
+        });
+        return actors;
+    }
 
     function addDependencyByText(actor1, actor2) {
         let depx = 10, depy = 10;
         for (let i = 2; i < linenum; i++) {
             let dType = lines[i].split(': ')[0]
             let dName = lines[i].substring(lines[i].indexOf(': ') + 2)
-            ui.addDependencyWithName(actor1, dType + 'DependencyLink', actor2, dName, depx, depy)
+            isNodeDuplicate(actor1, actor2, dType, dName).then((isDuplicate) => {
+                if (!isDuplicate) {
+                    ui.addDependencyWithName(actor1, dType + 'DependencyLink', actor2, dName, depx, depy)
+                } else {
+                    ui.alert('INVALID: Sorry, the dependency link you are trying to add is duplicated.');
+                }
+            })
+
             depx += 100
             depy += 100
         }
@@ -427,25 +467,46 @@ ui.components.createAddButtons = function () {
         ui.changeAddMenuStatus('')
     }
 
+    ui.addLinkByTextOneActor = function (idx, x, y) {
+        switch (idx) {
+            case 1:
+                actor1 = addElement(type1, name1, x, y);
+                actor2 = getActorByNameType(type2, name2)[0]
+                break
+            case 2:
+                actor1 = getActorByNameType(type1, name1)[0]
+                actor2 = addElement(type2, name2, x, y);
+                break
+        }
+        addDependencyByText(actor1, actor2);
+        ui.states.editor.transitionTo(ui.states.editor.VIEWING);
+        ui.resetPointerStyles();
+        ui.changeAddMenuStatus('')
+    }
+
     function tryAddActors(type1, name1, type2, name2) {
-        const allActors = listAllActors();
-        let js1 = 0, js2 = 0;
-        let actor1, actor2;
-        _.forEach(allActors, function (actor) {
-            if (name1 === actor.prop('name') && type1 === actor.prop('type')) {
-                js1++
-                actor1 = actor
-            }
-            if (name2 === actor.prop('name') && type2 === actor.prop('type')) {
-                js2++
-                actor2 = actor
-            }
-        });
+        let actor1 = getActorByNameType(type1, name1), actor2 = getActorByNameType(type2, name2);
+        const js1 = actor1.length
+        const js2 = actor2.length
+        actor1 = actor1[0]
+        actor2 = actor2[0]
         if (js1 === 1 && js2 === 1) {
             addDependencyByText(actor1, actor2)
         } else if (js1 === 0 && js2 === 0) {
             ui.selectPaper();
             ui.states.editor.current = ui.states.editor.ADDING.ADD_LINK_BY_TEXT
+            $('#diagram').css('cursor', 'crosshair');
+            $('#diagram g').css('cursor', 'no-drop');
+            $('#diagram .actorKindMain').css('cursor', 'no-drop');
+        } else if (js1 === 1 && js2 === 0) {
+            ui.selectPaper();
+            ui.states.editor.current = ui.states.editor.ADDING.ADD_LINK_BY_TEXT_ACTOR_2
+            $('#diagram').css('cursor', 'crosshair');
+            $('#diagram g').css('cursor', 'no-drop');
+            $('#diagram .actorKindMain').css('cursor', 'no-drop');
+        } else if (js1 === 0 && js2 === 1) {
+            ui.selectPaper();
+            ui.states.editor.current = ui.states.editor.ADDING.ADD_LINK_BY_TEXT_ACTOR_1
             $('#diagram').css('cursor', 'crosshair');
             $('#diagram g').css('cursor', 'no-drop');
             $('#diagram .actorKindMain').css('cursor', 'no-drop');
@@ -475,15 +536,19 @@ ui.components.createAddButtons = function () {
                 '...',
             callback: function (value) {
                 if (!value) return
-                value = value.trim()
-                lines = value.split('\n')
-                const line1 = lines[0].split(' depends on ')
-                linenum = lines.length
-                type1 = line1[0].substring(0, line1[0].indexOf(' '))
-                name1 = line1[0].substring(line1[0].indexOf(' ') + 1)
-                type2 = line1[1].substring(0, line1[1].indexOf(' '))
-                name2 = line1[1].substring(line1[1].indexOf(' ') + 1)
-                tryAddActors(type1, name1, type2, name2)
+                value = value.trim();
+                lines = value.split('\n');
+                const line1 = lines[0].split(' depends on ');
+                linenum = lines.length;
+                type1 = line1[0].substring(0, line1[0].indexOf(' '));
+                name1 = line1[0].substring(line1[0].indexOf(' ') + 1);
+                type2 = line1[1].substring(0, line1[1].indexOf(' '));
+                name2 = line1[1].substring(line1[1].indexOf(' ') + 1);
+                if (type1 === type2 && name1 === name2) {
+                    ui.alert('INVALID: Sorry, the dependency link you are trying to add is invalid.');
+                } else {
+                    tryAddActors(type1, name1, type2, name2);
+                }
             }
         });
     }
