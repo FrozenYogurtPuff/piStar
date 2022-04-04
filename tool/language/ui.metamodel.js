@@ -31,6 +31,9 @@ ui.setupMetamodelUI = function () {
     if (istar.metamodel.nodes.Resource) {
         istar.metamodel.nodes.Resource.buttonStatusText = 'Adding <b>Resource</b>: Click on an actor/role/agent to add a Resource';
     }
+    if (istar.metamodel.nodes.ToBeRefined) {
+        istar.metamodel.nodes.ToBeRefined.buttonStatusText = 'Adding <b>To-Be-Refined</b>: Click on an actor/role/agent to add a Resource';
+    }
 
     if (istar.metamodel.containerLinks.IsALink) {
         istar.metamodel.containerLinks.IsALink.buttonLabel = 'Is A Link';

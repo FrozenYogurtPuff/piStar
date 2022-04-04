@@ -121,7 +121,7 @@ ui.components.createAddButtons = function () {
 
         let textModel = new ui.components.AddButtonModel({
             action: ui.states.editor.ADDING.ADD_CONTAINER,
-            buttonImage: null,
+            buttonImage: 'DefaultContainer',
             defaultButtonImage: 'DefaultContainer.svg',
             label: 'Add by text',
             name: '',
@@ -164,7 +164,7 @@ ui.components.createAddButtons = function () {
 
         let textModel2 = new ui.components.AddButtonModel({
             action: ui.states.editor.ADDING.ADD_CONTAINER,
-            buttonImage: null,
+            buttonImage: 'DefaultContainer',
             defaultButtonImage: 'DefaultContainer.svg',
             label: 'Add by text2',
             name: '',
@@ -406,11 +406,16 @@ ui.components.createAddButtons = function () {
                 if (Dependencies.has(node.prop('type'))) {
                     if (node.prop('type') === type && node.prop('name') === name) {
                         const neighbours = istar.graph.getNeighbors(node);
-                        let neighboursID = []
+                        // two-way duplicate
+                        /*let neighboursID = []
                         for (let i = 0; i < neighbours.length; i++) {
                             neighboursID.push(neighbours[i].prop('id'))
                         }
                         if (neighboursID.includes(actor1.prop('id')) && neighboursID.includes(actor2.prop('id'))) {
+                            resolve(true)
+                        }*/
+                        // one-way duplicate (may not stable)
+                        if (neighbours[0] === actor2 && neighbours[1] === actor1) {
                             resolve(true)
                         }
                     }
@@ -437,8 +442,16 @@ ui.components.createAddButtons = function () {
     function addDependencyByText(actor1, actor2) {
         let depx = 10, depy = 10;
         for (let i = 2; i < linenum; i++) {
-            let dType = lines[i].split(': ')[0]
-            let dName = lines[i].substring(lines[i].indexOf(': ') + 2)
+            let dType = "", dName = "";
+            // Goal, Task, Quality, Resource
+            if (lines[i].indexOf(":") !== -1) {
+                dType = lines[i].split(': ')[0]
+                dName = lines[i].substring(lines[i].indexOf(': ') + 2)
+            } else {
+                dType = "ToBeRefined"
+                dName = lines[i].trim()
+            }
+            // TODO: duplicate node detect
             isNodeDuplicate(actor1, actor2, dType, dName).then((isDuplicate) => {
                 if (!isDuplicate) {
                     ui.addDependencyWithName(actor1, dType + 'DependencyLink', actor2, dName, depx, depy)
@@ -518,7 +531,7 @@ ui.components.createAddButtons = function () {
 
     let addDependencyByTextModel = new ui.components.AddButtonModel({
         action: ui.states.editor.ADDING.ADD_LINK,
-        buttonImage: null,
+        buttonImage: 'DefaultDependencyLink',
         defaultButtonImage: 'DefaultDependencyLink.svg',
         label: 'Add Dependency by text',
         name: '',
