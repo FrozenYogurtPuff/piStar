@@ -720,7 +720,8 @@ ui.addDependency = function (source, dependencyType, target) {
     var position = {x: 10, y: 10};
     var text = 'Dependum';
 
-    var dependumType = dependencyType.replace('DependencyLink', '');
+    var dependumType = dependencyType.replace('DependencyLink', '')
+    if (dependumType === 'To-Be-Refined') {dependumType = 'ToBeRefined';}
     node = istar['add' + dependumType](text, position);
 
     var links = istar.addDependency(source, node, target);

@@ -35,6 +35,7 @@ ui.components.createAddButtons = function () {
             }).render();
         });
 
+        // Add Actor with rectangle layout
         let positionX = 0
         let positionY = 0
         let initX = 0
@@ -72,6 +73,7 @@ ui.components.createAddButtons = function () {
             $('#diagram .actorKindMain').css('cursor', 'no-drop');
         }
 
+        // Add Actor by text by given type and name, with auto layout
         function addElement(type, name) {
             try {
                 name = name.trim()
@@ -101,7 +103,6 @@ ui.components.createAddButtons = function () {
                 ui.alert('INVALID: Sorry, but one of the actor you are trying to create is invalid');
                 ui.clearElements();
             }
-
         }
 
         let elementsToAdd = []
@@ -119,6 +120,7 @@ ui.components.createAddButtons = function () {
             ui.changeAddMenuStatus('')
         }
 
+        // Add by text1
         let textModel = new ui.components.AddButtonModel({
             action: ui.states.editor.ADDING.ADD_CONTAINER,
             buttonImage: 'DefaultContainer',
@@ -162,6 +164,7 @@ ui.components.createAddButtons = function () {
             attributes: {parent: '#add-actor-dropdown'}, model: textModel
         }).render();
 
+        // Add by text2
         let textModel2 = new ui.components.AddButtonModel({
             action: ui.states.editor.ADDING.ADD_CONTAINER,
             buttonImage: 'DefaultContainer',
@@ -213,6 +216,7 @@ ui.components.createAddButtons = function () {
             attributes: {parent: '#add-actor-dropdown'}, model: textModel2
         }).render();
 
+        // Add Actor by text
         let addActorByTextModel = new ui.components.AddButtonModel({
             action: ui.states.editor.ADDING.ADD_CONTAINER,
             buttonImage: 'Actor',
@@ -244,6 +248,7 @@ ui.components.createAddButtons = function () {
             attributes: {parent: '#add-actor-dropdown'}, model: addActorByTextModel
         }).render();
 
+        // Add Agent by text
         let addAgentByTextModel = new ui.components.AddButtonModel({
             action: ui.states.editor.ADDING.ADD_CONTAINER,
             buttonImage: 'Agent',
@@ -274,6 +279,7 @@ ui.components.createAddButtons = function () {
             attributes: {parent: '#add-actor-dropdown'}, model: addAgentByTextModel
         }).render();
 
+        // Add Role by text
         let addRoleByTextModel = new ui.components.AddButtonModel({
             action: ui.states.editor.ADDING.ADD_CONTAINER,
             buttonImage: 'Role',
@@ -358,6 +364,7 @@ ui.components.createAddButtons = function () {
         }
     });
 
+    // Add Actor by given type, name and position
     function addElement(type, name, x, y) {
         try {
             name = name.trim()
@@ -388,6 +395,7 @@ ui.components.createAddButtons = function () {
 
     }
 
+    // List all actors on canvas
     function listAllActors() {
         let allActors = []
         const Actors = new Set(['Agent', 'Role', 'Actor'])
@@ -399,6 +407,7 @@ ui.components.createAddButtons = function () {
         return allActors
     }
 
+    // Check Actor duplicate with name and type
     function isNodeDuplicate(actor1, actor2, type, name) {
         const Dependencies = new Set(['Goal', 'Quality', 'Resource', 'Task'])
         return new Promise((resolve, reject) => {
@@ -428,6 +437,7 @@ ui.components.createAddButtons = function () {
     let type1, name1, type2, name2, lines, linenum
     let actor1, actor2
 
+    // Select Actor by given type and name
     function getActorByNameType(type, name) {
         const allActors = listAllActors();
         let actors = [];
@@ -439,6 +449,7 @@ ui.components.createAddButtons = function () {
         return actors;
     }
 
+    // Add dependency by text
     function addDependencyByText(actor1, actor2) {
         let depx = 10, depy = 10;
         for (let i = 2; i < linenum; i++) {
@@ -471,6 +482,7 @@ ui.components.createAddButtons = function () {
         linenum = 0
     }
 
+    // Add link by text
     ui.addLinkByText = function (x, y) {
         const actor1 = addElement(type1, name1, x, y);
         const actor2 = addElement(type2, name2, x + 250, y);
@@ -480,6 +492,7 @@ ui.components.createAddButtons = function () {
         ui.changeAddMenuStatus('')
     }
 
+    // Add link by text with only one of the actors exist
     ui.addLinkByTextOneActor = function (idx, x, y) {
         switch (idx) {
             case 1:
@@ -529,6 +542,7 @@ ui.components.createAddButtons = function () {
         }
     }
 
+    // Add dependency by text
     let addDependencyByTextModel = new ui.components.AddButtonModel({
         action: ui.states.editor.ADDING.ADD_LINK,
         buttonImage: 'DefaultDependencyLink',
