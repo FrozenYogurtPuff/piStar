@@ -680,8 +680,11 @@ ui.addElementOnContainer = function (cellView, options) {
             var bbox = (new istar.metamodel.nodes[currentAddingElement].shapeObject()).getBBox();
             options.position.x -= bbox.width/2;
             options.position.y -= bbox.height/2;
-
-            var element = ui.addNodeInPlace(cellView.model, istar['add' + currentAddingElement], options);
+            let addingElement = currentAddingElement
+            if (currentAddingElement === 'To-Be-Refined') {
+                addingElement = 'ToBeRefined'
+            }
+            var element = ui.addNodeInPlace(cellView.model, istar['add' + addingElement], options);
 
             if (istar.metamodel.nodes[currentAddingElement].customProperties) {
                 element.prop('customProperties', istar.metamodel.nodes[currentAddingElement].customProperties);
