@@ -113,6 +113,7 @@ ui.components.createAddButtons = function () {
             })
         }
 
+        // Reset status
         ui.clearElements = function () {
             elementsToAdd = []
             ui.states.editor.transitionTo(ui.states.editor.VIEWING);
@@ -233,7 +234,10 @@ ui.components.createAddButtons = function () {
                 inputType: 'textarea',
                 placeholder: 'name1\nname2\nname3\n',
                 callback: function (value) {
-                    if (!value) return
+                    if (!value) {
+                        ui.clearElements();
+                        return
+                    }
                     value = value.trim()
                     let lines = value.split('\n')
                     _.forEach(lines, function (line) {
@@ -265,7 +269,10 @@ ui.components.createAddButtons = function () {
                 inputType: 'textarea',
                 placeholder: 'name1\nname2\nname3\n',
                 callback: function (value) {
-                    if (!value) return
+                    if (!value) {
+                        ui.clearElements();
+                        return
+                    }
                     value = value.trim()
                     let lines = value.split('\n')
                     _.forEach(lines, function (line) {
@@ -296,7 +303,10 @@ ui.components.createAddButtons = function () {
                 inputType: 'textarea',
                 placeholder: 'name1\nname2\nname3\n',
                 callback: function (value) {
-                    if (!value) return
+                    if (!value) {
+                        ui.clearElements();
+                        return
+                    }
                     value = value.trim()
                     let lines = value.split('\n')
                     _.forEach(lines, function (line) {
@@ -542,6 +552,26 @@ ui.components.createAddButtons = function () {
         }
     }
 
+    ui.addDependencyByText = function (value) {
+        if (!value) {
+            ui.clearElements();
+            return
+        }
+        value = value.trim();
+        lines = value.split('\n');
+        const line1 = lines[0].split(' depends on ');
+        linenum = lines.length;
+        type1 = line1[0].substring(0, line1[0].indexOf(' '));
+        name1 = line1[0].substring(line1[0].indexOf(' ') + 1);
+        type2 = line1[1].substring(0, line1[1].indexOf(' '));
+        name2 = line1[1].substring(line1[1].indexOf(' ') + 1);
+        if (type1 === type2 && name1 === name2) {
+            ui.alert('INVALID: Sorry, the dependency link you are trying to add is invalid.');
+        } else {
+            tryAddActors(type1, name1, type2, name2);
+        }
+    }
+
     // Add dependency by text
     let addDependencyByTextModel = new ui.components.AddButtonModel({
         action: ui.states.editor.ADDING.ADD_LINK,
@@ -549,7 +579,7 @@ ui.components.createAddButtons = function () {
         defaultButtonImage: 'DefaultDependencyLink.svg',
         label: 'Add Dependency by text',
         name: '',
-        statusText: 'statusText',
+        statusText: 'Add Dependency by text',
         tooltip: 'Add Dependency by text'
     })
     addDependencyByTextModel.act = function (e) {
@@ -561,22 +591,7 @@ ui.components.createAddButtons = function () {
                 'On:\n' +
                 '<type>: <name>\n' +
                 '...',
-            callback: function (value) {
-                if (!value) return
-                value = value.trim();
-                lines = value.split('\n');
-                const line1 = lines[0].split(' depends on ');
-                linenum = lines.length;
-                type1 = line1[0].substring(0, line1[0].indexOf(' '));
-                name1 = line1[0].substring(line1[0].indexOf(' ') + 1);
-                type2 = line1[1].substring(0, line1[1].indexOf(' '));
-                name2 = line1[1].substring(line1[1].indexOf(' ') + 1);
-                if (type1 === type2 && name1 === name2) {
-                    ui.alert('INVALID: Sorry, the dependency link you are trying to add is invalid.');
-                } else {
-                    tryAddActors(type1, name1, type2, name2);
-                }
-            }
+            callback: ui.addDependencyByText
         });
     }
     new ui.components.AddButtonDropdownItemView({
@@ -688,6 +703,8 @@ ui.components.createAddButtons = function () {
             }
         }
     });
+
+    // Add by template
 
 }
 

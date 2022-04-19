@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Add by template</title>
+    <script src="../../istarcore/lib/lodash.min.js"></script>
+    <script src="../../ui/lib/vue.global.prod.js"></script>
+</head>
+<style>
+    #app {
+        margin: 0;
+    }
+
+    .input-number {
+        width: 50px;
+    }
+
+    .input-text {
+        width: 120px;
+    }
+
+    textarea {
+        margin-top: 30px;
+        width: 100%;
+        height: 200px;
+    }
+</style>
+<body>
+
+<div id="app">
+    <input type="text" class="input-text" v-model="actorAName"> depend on <input type="text" class="input-text"
+                                                                                 v-model="actorBName">
+    <br>&nbsp;&nbsp;to achieve <input type="number" class="input-number" :min=0 v-model="goalCount"> goals
+    <br>&nbsp;&nbsp;to perform <input type="number" class="input-number" :min=3 v-model="taskCount"> tasks
+    <br>&nbsp;&nbsp;for <input type="number" class="input-number" :min=0 v-model="resourceCount"> resources
+    <br>
+    <textarea id="result-box" v-model="result"></textarea>
+</div>
+
+<script>
+    Vue.createApp({
+        data() {
+            return {
+                actorAType: "Agent",
+                actorAName: "Owners",
+                actorBType: "Agent",
+                actorBName: "Software",
+                goalCount: 3,
+                taskCount: 0,
+                resourceCount: 0,
+                dependums: [
+                    {
+                        type: "Goal",
+                        name: "goal 1",
+                    },
+                    {
+                        type: "Goal",
+                        name: "goal 2",
+                    },
+                    {
+                        type: "Goal",
+                        name: "goal 3",
+                    }
+                ],
+                result: 'Agent Owners depends on Agent Software\n' +
+                    'On:\n' +
+                    'Goal: goal 1\n' +
+                    'Goal: goal 2\n' +
+                    'Goal: goal 3'
+            }
+        },
+        watch: {
+            result: function (newVal, oldVal) {
+                const val = newVal.replace('\n\n', '\n').trim()
+                const lines = val.split('\n');
+                let result = this.checkDependency(lines[0])
+                if (result.isValid) {
+                    this.actorAType = result.actor1_type
+                    this.actorAName = result.actor1_name
+                    this.actorBType = result.actor2_type
+                    this.actorBName = result.actor2_name
+                }
+                result = this.checkDependums(lines.slice(2))
+                this.dependums = []
+                const that = this
+                this.goalCount = result.goal
+                this.taskCount = result.task
+                this.resourceCount = result.resource
+                _.forEach(result.dependums, function (d) {
+                    that.dependums.push({type: d.type, name: d.name})
+                })
+            },
+            actorAName: function (val) {
+                this.genResult()
+            },
+            actorBName: function (val) {
+                this.genResult()
+            },
+            goalCount: function (val) {
+                const count = this.calCount("Goal")
+                if (this.goalCount < 3) {
+                    alert("The quantity of task cannot be less than 3.")
+                    this.goalCount = 3
+                } else {
+                    if (count < val) {
+                        this.addDependum("Goal", val - count)
+                    } else if (count > val) {
+                        this.delDependum("Goal", count - val)
+                    }
+                }
+            },
+            taskCount: function (val) {
+                const count = this.calCount("Task")
+                if (count < val) {
+                    this.addDependum("Task", val - count)
+                } else if (count > val) {
+                    this.delDependum("Task", count - val)
+                }
+            },
+            resourceCount: function (val) {
+                const count = this.calCount("Resource")
+                if (count < val) {
+                    this.addDependum("Resource", val - count)
+                } else if (count > val) {
+                    this.delDependum("Resource", count - val)
+                }
+            }
+        },
+        methods: {
+            genResult: function () {
+                let s = `${this.actorAType} ${this.actorAName} depends on ${this.actorBType} ${this.actorBName}\n`
+                s += 'On:\n'
+                _.forEach(this.dependums, function (val) {
+                    s += `${val.type}: ${val.name}\n`
+                })
+                this.result = s
+            },
+            calCount: function (type) {
+                let count = 0
+                _.forEach(this.dependums, function (val) {
+                    if (val.type === type) count++
+                })
+                return count
+            },
+            addDependum: function (type, ...number) {
+                if (!number) number = 1
+                while (number--) {
+                    this.dependums.push({
+                        type: type,
+                        name: type.toLowerCase()
+                    })
+                }
+                this.genResult()
+            },
+            delDependum: function (type, ...number) {
+                if (!number) number = 1
+                while (number--) {
+                    let l = this.dependums.length
+                    for (let i = l - 1; i >= 0; i--) {
+                        if (this.dependums[i].type === type) {
+                            this.dependums.splice(i, 1)
+                            break
+                        }
+                    }
+                }
+                this.genResult()
+            },
+            checkDependency: function (line) {
+                let result = {
+                    actor1_type: null,
+                    actor1_name: null,
+                    actor2_type: null,
+                    actor2_name: null,
+                    isValid: false
+                }
+                line = line.trim()
+                const actors = new Set(['Agent', 'Role', 'Actor'])
+                try {
+                    const line1 = line.split(' depends on ')
+                    const actor1_type = line1[0].substring(0, line1[0].indexOf(' '));
+                    const actor1_name = line1[0].substring(line1[0].indexOf(' ') + 1);
+                    const actor2_type = line1[1].substring(0, line1[1].indexOf(' '));
+                    const actor2_name = line1[1].substring(line1[1].indexOf(' ') + 1);
+                    // console.log(line1, actor1_type, actor1_name, actor2_type, actor2_name)
+                    result = {
+                        actor1_type: actor1_type,
+                        actor1_name: actor1_name,
+                        actor2_type: actor2_type,
+                        actor2_name: actor2_name
+                    }
+                    result.isValid = actors.has(actor1_type) && actors.has(actor2_type);
+                } catch (e) {
+                    alert('Actors should connect with "depends on" syntax.')
+                    result.isValid = false
+                }
+                return result
+            },
+            checkDependums: function (lines) {
+                let result = {
+                    dependums: [],
+                    goal: 0,
+                    task: 0,
+                    resource: 0,
+                    isValid: false
+                }
+                const dependums = new Set(['Task', 'Goal', 'Resource', 'Quality'])
+                try {
+                    _.forEach(lines, function (line) {
+                        const type = line.split(': ')[0]
+                        const name = line.substring(line.indexOf(': ') + 2)
+                        result.isValid = dependums.has(type);
+                        result.dependums.push({type: type, name: name})
+                        if (type === 'Task') result.task++
+                        if (type === 'Goal') result.goal++
+                        if (type === 'Resource') result.resource++
+                    })
+                } catch (e) {
+                    result.isValid = false
+                }
+                return result
+            }
+        }
+    }).mount('#app')
+</script>
+
+</body>
+</html>
+
