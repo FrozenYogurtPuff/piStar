@@ -520,6 +520,10 @@ ui.components.createAddButtons = function () {
         ui.changeAddMenuStatus('')
     }
 
+    ui.tryAddActor = function (type, name) {
+
+    }
+
     function tryAddActors(type1, name1, type2, name2) {
         let actor1 = getActorByNameType(type1, name1), actor2 = getActorByNameType(type2, name2);
         const js1 = actor1.length
@@ -704,8 +708,51 @@ ui.components.createAddButtons = function () {
         }
     });
 
-    // Add by template
+    function addIntentions (cellView, x, y) {
+        ui.states.editor.ADDING.data.button = {
+            end: function () {
+                'use strict';
+                ui.states.editor.transitionTo(ui.states.editor.VIEWING);
+            }
+        }
+        const initX = x
+        let posX = x, posY = y
+        const len = ui.states.editor.ADDING.data.intentionsToAdd.length
+        _.forEach(ui.states.editor.ADDING.data.intentionsToAdd, function (i) {
+            ui.states.editor.ADDING.data.typeNameToAdd = i.type
+            ui.addElementOnContainer(cellView, {position: {x: posX, y: posY}, name: i.name});
+            let col = Math.ceil(Math.sqrt(len))
+            posX += 100
+            if (posX > initX + (col - 1) * 100) {
+                posX = initX
+                posY += 60
+            }
+        })
+        ui.states.editor.ADDING.data.typeNameToAdd = ''
+        ui.states.editor.ADDING.data.intentionsToAdd = []
+        ui.clearElements()
+    }
 
+    // Add by template
+    ui.addIntentionByText = function (cellView, x, y) {
+        if (cellView.model.prop('id') !== ui.states.editor.ADDING.data.intentionAddCellID) {
+            ui.confirm({
+                message: 'You selected a different Actor, do you really want to add intentions in to this actor? Click OK to continue, Cancel to re-select.',
+                callback: function (result) {
+                    if (result) {
+                        addIntentions(cellView, x, y)
+                    } else {
+                        ui.selectPaper();
+                        $('#diagram g').css('cursor', 'crosshair');
+                        $('#diagram .actorKindMain').css('cursor', 'crosshair');
+                        ui.states.editor.current = ui.states.editor.ADDING.ADD_INTENTION_BY_TEXT
+                    }
+                }
+            })
+        } else {
+            addIntentions(cellView, x, y)
+        }
+    }
 }
 
 /*definition of globals to prevent undue JSHint warnings*/

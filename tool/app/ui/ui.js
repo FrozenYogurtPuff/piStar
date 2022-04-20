@@ -23,6 +23,7 @@ var ui = function() {
                     ADD_LINK_BY_TEXT: 105,
                     ADD_LINK_BY_TEXT_ACTOR_1: 106,
                     ADD_LINK_BY_TEXT_ACTOR_2: 107,
+                    ADD_INTENTION_BY_TEXT:108,
                     data: {
                         button: null, /* the 'add button' that is currently selected */
                         typeNameToAdd: null, /* the name of the type that is to be added */
@@ -31,7 +32,9 @@ var ui = function() {
                         linkValue: null,
                         isLinkSourceUndefined: function () {
                             return this.linkSourceView === null;
-                        }
+                        },
+                        intentionsToAdd: [],
+                        intentionAddCellID: null,
                     }
                 },
                 VIEWING: 2,
@@ -428,6 +431,10 @@ ui.defineInteractions = function () {
     istar.paper.on('cell:pointerup', function (cellView, evt, x, y) {
         var currentAddingElement = ui.states.editor.ADDING.data.typeNameToAdd;
 
+        if (ui.states.editor.current === ui.states.editor.ADDING.ADD_INTENTION_BY_TEXT) {
+            ui.addIntentionByText(cellView, x, y)
+        }
+
         if (ui.states.editor.isAddingNode()) {
             ui.addElementOnContainer(cellView, {position: {x: x, y: y}});
 
@@ -658,6 +665,7 @@ ui.addElementOnPaper = function (options) {
     }
 };
 
+// TODO: HERE
 ui.addElementOnContainer = function (cellView, options) {
     'use strict';
 
@@ -685,6 +693,10 @@ ui.addElementOnContainer = function (cellView, options) {
                 addingElement = 'ToBeRefined'
             }
             var element = ui.addNodeInPlace(cellView.model, istar['add' + addingElement], options);
+
+            if (options.name) {
+                element.prop('name', options.name)
+            }
 
             if (istar.metamodel.nodes[currentAddingElement].customProperties) {
                 element.prop('customProperties', istar.metamodel.nodes[currentAddingElement].customProperties);
