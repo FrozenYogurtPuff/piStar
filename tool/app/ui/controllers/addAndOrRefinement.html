@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Add by template</title>
+    <title>Add AND/OR Refinement</title>
     <script src="../../istarcore/lib/lodash.min.js"></script>
     <script src="../../ui/lib/vue.global.prod.js"></script>
 </head>
@@ -16,22 +16,25 @@
     }
 
     textarea {
-        margin-top: 30px;
+        margin-top: 20px;
         width: 100%;
         height: 200px;
     }
+
+    label {
+        margin-right: 20px;
+    }
 </style>
 <body>
-
 <div id="app">
-    Goals or Tasks in a/an
-    <select v-model="actorType">
-        <option value="Actor">Actor</option>
-        <option value="Agent">Agent</option>
-        <option value="Role">Role</option>
-    </select>
-    &nbsp;named&nbsp;<input type="text" class="input-text" v-model="actorName">
-    <br>
+    <div>
+        <input type="radio" id="and-refinement"
+               name="refinement" value="and">
+        <label for="and-refinement">AND-Refinement</label>
+        <input type="radio" id="or-refinement"
+               name="refinement" value="or">
+        <label for="or-refinement">OR-Refinement</label>
+    </div>
     <textarea id="result-box" v-model="result"></textarea>
 </div>
 
@@ -39,41 +42,10 @@
     Vue.createApp({
         data() {
             return {
-                actorType: "Actor",
-                actorName: "actor",
-                dependums: [
-                    {
-                        type: "Goal",
-                        name: "goal 1",
-                    },
-                    {
-                        type: "Goal",
-                        name: "goal 2",
-                    },
-                    {
-                        type: "Goal",
-                        name: "goal 3",
-                    },
-                    {
-                        type: "Task",
-                        name: "task 1",
-                    },
-                    {
-                        type: "Task",
-                        name: "task 2",
-                    }
-                ],
-                text: "Goal: goal 1\n" +
-                    "Goal: goal 2\n" +
-                    "Goal: goal 3\n" +
-                    "Task: task 1\n" +
-                    "Task: task 2",
-                result: 'Goals or tasks in Actor: actor\n' +
-                    'Goal: goal 1\n' +
-                    'Goal: goal 2\n' +
-                    'Goal: goal 3\n' +
-                    'Task: task 1\n' +
-                    'Task: task 2'
+                iType: null,
+                iName: null,
+                result: "Goal: goal 1\n" +
+                    "Task: task 1"
             }
         },
         watch: {
@@ -134,7 +106,5 @@
         }
     }).mount('#app')
 </script>
-
 </body>
 </html>
-

@@ -23,7 +23,8 @@ var ui = function() {
                     ADD_LINK_BY_TEXT: 105,
                     ADD_LINK_BY_TEXT_ACTOR_1: 106,
                     ADD_LINK_BY_TEXT_ACTOR_2: 107,
-                    ADD_INTENTION_BY_TEXT:108,
+                    ADD_INTENTION_BY_TEXT: 108,
+                    ADD_REFINEMENTS_BY_TEXT: 109,
                     data: {
                         button: null, /* the 'add button' that is currently selected */
                         typeNameToAdd: null, /* the name of the type that is to be added */
@@ -35,6 +36,7 @@ var ui = function() {
                         },
                         intentionsToAdd: [],
                         intentionAddCellID: null,
+                        addRefinementTo: null,
                     }
                 },
                 VIEWING: 2,
@@ -434,6 +436,9 @@ ui.defineInteractions = function () {
         if (ui.states.editor.current === ui.states.editor.ADDING.ADD_INTENTION_BY_TEXT) {
             ui.addIntentionByText(cellView, x, y)
         }
+        if (ui.states.editor.current === ui.states.editor.ADDING.ADD_REFINEMENTS_BY_TEXT) {
+            ui.addRefinementLinkByText(ui.states.editor.ADDING.data.typeNameToAdd, cellView, x, y)
+        }
 
         if (ui.states.editor.isAddingNode()) {
             ui.addElementOnContainer(cellView, {position: {x: x, y: y}});
@@ -665,7 +670,6 @@ ui.addElementOnPaper = function (options) {
     }
 };
 
-// TODO: HERE
 ui.addElementOnContainer = function (cellView, options) {
     'use strict';
 
@@ -711,6 +715,7 @@ ui.addElementOnContainer = function (cellView, options) {
         console.log(e);
         ui.states.editor.transitionTo(ui.states.editor.VIEWING);
     }
+    return element
 };
 ui.addLinkBetweenContainers = function (newLink, targetCellView) {
     'use strict';

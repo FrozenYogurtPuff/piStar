@@ -708,7 +708,7 @@ ui.components.createAddButtons = function () {
         }
     });
 
-    function addIntentions (cellView, x, y) {
+    function addIntentions(cellView, x, y) {
         ui.states.editor.ADDING.data.button = {
             end: function () {
                 'use strict';
@@ -751,6 +751,43 @@ ui.components.createAddButtons = function () {
             })
         } else {
             addIntentions(cellView, x, y)
+        }
+    }
+
+    ui.addRefinementLinkByText = function (type, target, x, y) {
+        if (target.model.prop('id') === ui.states.editor.ADDING.data.intentionAddCellID) {
+            const refinementTo = ui.states.editor.ADDING.data.addRefinementTo
+            ui.states.editor.ADDING.data.button = {
+                end: function () {
+                    'use strict';
+                    ui.states.editor.transitionTo(ui.states.editor.VIEWING);
+                }
+            }
+            const initX = x
+            let posX = x + 50, posY = y
+            const len = ui.states.editor.ADDING.data.intentionsToAdd.length
+            _.forEach(ui.states.editor.ADDING.data.intentionsToAdd, function (i) {
+                ui.states.editor.ADDING.data.typeNameToAdd = i.type
+                const source = ui.addElementOnContainer(target, {position: {x: posX, y: posY}, name: i.name});
+                let linkType
+                if (type === 'or') {
+                    linkType = istar.metamodel.nodeLinks.OrRefinementLink
+                } else if (type === 'and') {
+                    linkType = istar.metamodel.nodeLinks.AndRefinementLink
+                }
+                istar.addLinkBetweenNodes(linkType, source, refinementTo)
+                let col = Math.ceil(Math.sqrt(len))
+                posX += 50
+                if (posX > initX + (col - 1) * 50) {
+                    posX = initX
+                    posY += 60
+                }
+            })
+            ui.states.editor.ADDING.data.typeNameToAdd = ''
+            ui.states.editor.ADDING.data.intentionsToAdd = []
+            ui.clearElements()
+        } else {
+            ui.alert("You selected a wrong position.")
         }
     }
 }
