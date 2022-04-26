@@ -518,3 +518,8 @@ svg * {
 .flash-off {
   transition: background-color .3s ease-out;
 }
+
+.mediumTextarea textarea {
+  margin-top: 10px;
+  height: 200px;
+}

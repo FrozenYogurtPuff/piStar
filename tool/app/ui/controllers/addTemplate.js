@@ -76,13 +76,14 @@ $("#add-by-template-owners-software").click(function () {
     })
 })
 
-$("#add-intentions-in-actor").click(function () {
+$("#add-intentions-to-actor").click(function () {
     const cell = ui.getSelectedCells()
     if (cell.length !== 1) {
         ui.alert("Please select one cell.")
         return
     }
     const actors = new Set(['Actor', 'Agent', 'Role'])
+    const intentions = new Set(['Task', 'Goal', 'Resource', 'Quality'])
     const element = cell[0]
     const type = element.prop('type')
     const name = element.prop('name')
@@ -92,9 +93,21 @@ $("#add-intentions-in-actor").click(function () {
         return
     }
 
+    const embeddedCells = element.getEmbeddedCells()
+    let msg = `Add Intentions to ${type}: ${name}, where the following intentions already exists:<br>`
+    _.forEach(embeddedCells, function (i) {
+        const iType = i.prop('type')
+        const iName = i.prop('name')
+        if (intentions.has(iType)) {
+            msg += `${iType}: ${iName}<br>`
+        }
+    })
+
     ui.prompt({
-        title: `Add Intentions in ${type}: ${name}`,
+        title: `Add Intentions to ${type}: ${name}`,
+        message: msg,
         inputType: 'textarea',
+        className: 'mediumTextarea',
         value: 'Goal: goal 1\n' +
             'Goal: goal 2\n' +
             'Goal: goal 3\n' +
@@ -120,49 +133,6 @@ $("#add-intentions-in-actor").click(function () {
             }
         }
     })
-
-    /*
-    bootbox.dialog({
-        title: `Add Intentions in ${type}: ${name}`,
-        message: '<iframe src="app/ui/controllers/addTemplateIntentionsInActor.html" style="width: 100%; border: none; height: 350px;"></iframe>',
-        onEscape: true,
-        buttons: {
-            ok: {
-                label: 'OK',
-                className: 'btn btn-primary bootbox-accept',
-                callback: function () {
-                    const i = document.querySelector('iframe')
-                    const d = i.contentWindow.document
-                    const val = d.getElementById('result-box').value
-                    // TODO: Get val and do things...
-                    ui.selectPaper();
-                    $('#diagram g').css('cursor', 'crosshair');
-                    $('#diagram .actorKindMain').css('cursor', 'crosshair');
-                    ui.states.editor.current = ui.states.editor.ADDING.ADD_INTENTION_BY_TEXT
-                    const lines = val.trim().replace('\n\n', '\n').split('\n')
-                    for (let i = 2; i < lines.length; i++) {
-                        let type = "", name = ""
-                        if (lines[i].indexOf(': ') !== -1) {
-                            type = lines[i].split(': ')[0]
-                            name = lines[i].split(': ')[1]
-                        } else {
-                            type = 'To-Be-Refined'
-                            name = lines[i]
-                        }
-                        console.log(type, name)
-                        ui.states.editor.ADDING.data.intentionsToAdd.push({type: type, name: name})
-                    }
-                }
-            },
-            cancel: {
-                label: 'Cancel',
-                className: 'btn btn-secondary btn-default bootbox-cancel',
-                callback: function () {
-                }
-            }
-        }
-    })
-    */
 })
 
 $("#add-more-refinements").click(function () {
@@ -184,10 +154,18 @@ $("#add-more-refinements").click(function () {
 
         if (intentions.has(type)) {
             if (canAddAndRefinement && !canAddOrRefinement) {
-                console.log('Add And Refinement')
+                let msg = `${type}: ${name} has been AND refined to: <br>`
+                const cells = istar.getElements()
+                _.forEach(cells, function (c) {
+                    if (istar.isThereLinkBetween(element, c, 'AndRefinementLink') && c.prop('id') !== element.prop('id')) {
+                        msg += `${c.prop('type')}: ${c.prop('name')}<br>`
+                    }
+                })
                 ui.prompt({
                     title: `Refine ${type}: ${name}, Add AND-Refinement`,
+                    message: msg,
                     inputType: 'textarea',
+                    className: 'mediumTextarea',
                     value: 'Goal: goal 1\n' +
                         'Task: task 1',
                     callback: function (val) {
@@ -212,10 +190,18 @@ $("#add-more-refinements").click(function () {
                     }
                 })
             } else if (!canAddAndRefinement && canAddOrRefinement) {
-                console.log('Add Or Refinement')
+                let msg = `${type}: ${name} has been OR refined to: <br>`
+                const cells = istar.getElements()
+                _.forEach(cells, function (c) {
+                    if (istar.isThereLinkBetween(element, c, 'OrRefinementLink') && c.prop('id') !== element.prop('id')) {
+                        msg += `${c.prop('type')}: ${c.prop('name')}<br>`
+                    }
+                })
                 ui.prompt({
                     title: `Refine ${type}: ${name}, Add OR-Refinement`,
+                    message: msg,
                     inputType: 'textarea',
+                    className: 'mediumTextarea',
                     value: 'Goal: goal 1\n' +
                         'Task: task 1',
                     callback: function (val) {
@@ -240,7 +226,6 @@ $("#add-more-refinements").click(function () {
                     }
                 })
             } else if (!canAddOrRefinement && !canAddOrRefinement) {
-                console.log('Can add And/Or Refinement')
                 bootbox.dialog({
                     title: `Refine ${type}: ${name}`,
                     message: '<iframe src="app/ui/controllers/addAndOrRefinement.html" style="width: 100%; border: none; height: 350px;"></iframe>',

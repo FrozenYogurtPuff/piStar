@@ -48,6 +48,7 @@
                 goalCount: 0,
                 taskCount: 3,
                 resourceCount: 0,
+                counter: 4,
                 dependums: [
                     {
                         type: "Task",
@@ -71,7 +72,7 @@
         },
         watch: {
             result: function (newVal, oldVal) {
-                const val = newVal.replace('\n\n', '\n').trim()
+                const val = newVal.replace('\n\n', '\n')
                 const lines = val.split('\n');
                 let result = this.checkDependency(lines[0])
                 if (result.isValid) {
@@ -87,7 +88,9 @@
                 this.taskCount = result.task
                 this.resourceCount = result.resource
                 _.forEach(result.dependums, function (d) {
-                    that.dependums.push({type: d.type, name: d.name})
+                    if (d.type && d.name) {
+                        that.dependums.push({type: d.type, name: d.name})
+                    }
                 })
             },
             actorAName: function (val) {
@@ -147,8 +150,9 @@
                 while (number--) {
                     this.dependums.push({
                         type: type,
-                        name: type.toLowerCase()
+                        name: type.toLowerCase() + ' ' + this.counter
                     })
+                    this.counter++
                 }
                 this.genResult()
             },
@@ -173,7 +177,7 @@
                     actor2_name: null,
                     isValid: false
                 }
-                line = line.trim()
+                // line = line.trim()
                 const actors = new Set(['Agent', 'Role', 'Actor'])
                 try {
                     const line1 = line.split(' depends on ')

@@ -30,8 +30,8 @@
 <div id="app">
     <input type="text" class="input-text" v-model="actorAName"> depend on <input type="text" class="input-text"
                                                                                  v-model="actorBName">
-    <br>&nbsp;&nbsp;to achieve <input type="number" class="input-number" :min=0 v-model="goalCount"> goals
-    <br>&nbsp;&nbsp;to perform <input type="number" class="input-number" :min=3 v-model="taskCount"> tasks
+    <br>&nbsp;&nbsp;to achieve <input type="number" class="input-number" :min=3 v-model="goalCount"> goals
+    <br>&nbsp;&nbsp;to perform <input type="number" class="input-number" :min=0 v-model="taskCount"> tasks
     <br>&nbsp;&nbsp;for <input type="number" class="input-number" :min=0 v-model="resourceCount"> resources
     <br>
     <textarea id="result-box" v-model="result"></textarea>
@@ -48,6 +48,7 @@
                 goalCount: 3,
                 taskCount: 0,
                 resourceCount: 0,
+                counter: 4,
                 dependums: [
                     {
                         type: "Goal",
@@ -71,7 +72,8 @@
         },
         watch: {
             result: function (newVal, oldVal) {
-                const val = newVal.replace('\n\n', '\n').trim()
+                //const lines = newVal.replace('\n\n', '\n').split('\n');
+                const val = newVal.replace('\n\n', '\n')
                 const lines = val.split('\n');
                 let result = this.checkDependency(lines[0])
                 if (result.isValid) {
@@ -87,7 +89,9 @@
                 this.taskCount = result.task
                 this.resourceCount = result.resource
                 _.forEach(result.dependums, function (d) {
-                    that.dependums.push({type: d.type, name: d.name})
+                    if (d.type && d.name) {
+                        that.dependums.push({type: d.type, name: d.name})
+                    }
                 })
             },
             actorAName: function (val) {
@@ -147,8 +151,9 @@
                 while (number--) {
                     this.dependums.push({
                         type: type,
-                        name: type.toLowerCase()
+                        name: type.toLowerCase() + ' ' + this.counter
                     })
+                    this.counter++
                 }
                 this.genResult()
             },
@@ -173,7 +178,7 @@
                     actor2_name: null,
                     isValid: false
                 }
-                line = line.trim()
+                // line = line.trim()
                 const actors = new Set(['Agent', 'Role', 'Actor'])
                 try {
                     const line1 = line.split(' depends on ')
