@@ -134,6 +134,7 @@ ui.components.createAddButtons = function () {
         textModel.act = function (e) {
             ui.prompt({
                 title: 'Add by text:',
+                className: 'mediumTextarea',
                 value: '',
                 inputType: 'textarea',
                 placeholder: 'Actor name1\nAgent name2\nRole name3',
@@ -178,6 +179,7 @@ ui.components.createAddButtons = function () {
         textModel2.act = function (e) {
             ui.prompt({
                 title: 'Add by text:',
+                className: 'mediumTextarea',
                 value: '',
                 inputType: 'textarea',
                 placeholder: 'Actor 3\nname1\nname2\nname3\n\nAgent 2\nname 1\nname 2\n\nRole 1\nname',
@@ -230,6 +232,7 @@ ui.components.createAddButtons = function () {
         addActorByTextModel.act = function (e) {
             ui.prompt({
                 title: 'Add Actor by text:',
+                className: 'mediumTextarea',
                 value: '',
                 inputType: 'textarea',
                 placeholder: 'name1\nname2\nname3\n',
@@ -265,6 +268,7 @@ ui.components.createAddButtons = function () {
         addAgentByTextModel.act = function (e) {
             ui.prompt({
                 title: 'Add Agent by text:',
+                className: 'mediumTextarea',
                 value: '',
                 inputType: 'textarea',
                 placeholder: 'name1\nname2\nname3\n',
@@ -299,6 +303,7 @@ ui.components.createAddButtons = function () {
         addRoleByTextModel.act = function (e) {
             ui.prompt({
                 title: 'Add Role by text:',
+                className: 'mediumTextarea',
                 value: '',
                 inputType: 'textarea',
                 placeholder: 'name1\nname2\nname3\n',
@@ -520,10 +525,6 @@ ui.components.createAddButtons = function () {
         ui.changeAddMenuStatus('')
     }
 
-    ui.tryAddActor = function (type, name) {
-
-    }
-
     function tryAddActors(type1, name1, type2, name2) {
         let actor1 = getActorByNameType(type1, name1), actor2 = getActorByNameType(type2, name2);
         const js1 = actor1.length
@@ -589,6 +590,7 @@ ui.components.createAddButtons = function () {
     addDependencyByTextModel.act = function (e) {
         ui.prompt({
             title: 'Add Dependency by text:',
+            className: 'mediumTextarea',
             value: '',
             inputType: 'textarea',
             placeholder: '<type> A depends on <type> B\n' +
