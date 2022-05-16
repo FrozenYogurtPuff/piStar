@@ -135,7 +135,7 @@ ui.components.createAddButtons = function () {
             ui.prompt({
                 title: 'Add by text:',
                 className: 'mediumTextarea',
-                value: '',
+                value: 'Actor name1\nAgent name2\nRole name3',
                 inputType: 'textarea',
                 placeholder: 'Actor name1\nAgent name2\nRole name3',
                 callback: function (value) {
@@ -166,21 +166,21 @@ ui.components.createAddButtons = function () {
             attributes: {parent: '#add-actor-dropdown'}, model: textModel
         }).render();
 
-        // Add by text2
+        // Add by text (in batches)
         let textModel2 = new ui.components.AddButtonModel({
             action: ui.states.editor.ADDING.ADD_CONTAINER,
             buttonImage: 'DefaultContainer',
             defaultButtonImage: 'DefaultContainer.svg',
-            label: 'Add by text2',
+            label: 'Add by text (in batches)',
             name: '',
             statusText: 'Add multiple Actors by text: click on empty space in diagram to add multiple Actors',
-            tooltip: 'Add by text2'
+            tooltip: 'Add by text (in batches)'
         })
         textModel2.act = function (e) {
             ui.prompt({
                 title: 'Add by text:',
                 className: 'mediumTextarea',
-                value: '',
+                value: 'Actor 3\nname1\nname2\nname3\n\nAgent 2\nname 1\nname 2\n\nRole 1\nname',
                 inputType: 'textarea',
                 placeholder: 'Actor 3\nname1\nname2\nname3\n\nAgent 2\nname 1\nname 2\n\nRole 1\nname',
                 callback: function (value) {
@@ -233,7 +233,7 @@ ui.components.createAddButtons = function () {
             ui.prompt({
                 title: 'Add Actor by text:',
                 className: 'mediumTextarea',
-                value: '',
+                value: 'name1\nname2\nname3\n',
                 inputType: 'textarea',
                 placeholder: 'name1\nname2\nname3\n',
                 callback: function (value) {
@@ -269,7 +269,7 @@ ui.components.createAddButtons = function () {
             ui.prompt({
                 title: 'Add Agent by text:',
                 className: 'mediumTextarea',
-                value: '',
+                value: 'name1\nname2\nname3\n',
                 inputType: 'textarea',
                 placeholder: 'name1\nname2\nname3\n',
                 callback: function (value) {
@@ -304,7 +304,7 @@ ui.components.createAddButtons = function () {
             ui.prompt({
                 title: 'Add Role by text:',
                 className: 'mediumTextarea',
-                value: '',
+                value: 'name1\nname2\nname3\n',
                 inputType: 'textarea',
                 placeholder: 'name1\nname2\nname3\n',
                 callback: function (value) {
@@ -591,7 +591,10 @@ ui.components.createAddButtons = function () {
         ui.prompt({
             title: 'Add Dependency by text:',
             className: 'mediumTextarea',
-            value: '',
+            value: '<type> A depends on <type> B\n' +
+                'On:\n' +
+                '<type>: <name>\n' +
+                '...',
             inputType: 'textarea',
             placeholder: '<type> A depends on <type> B\n' +
                 'On:\n' +
