@@ -523,3 +523,7 @@ svg * {
   margin-top: 10px;
   height: 200px;
 }
+
+#slogan {
+  font-size: 12px;
+}
