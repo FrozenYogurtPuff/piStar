@@ -31,7 +31,7 @@
     <input type="text" class="input-text" v-model="actorAName"> depend on <input type="text" class="input-text"
                                                                                  v-model="actorBName">
     <br>&nbsp;&nbsp;to achieve <input type="number" class="input-number" :min=0 v-model="goalCount"> goals
-    <br>&nbsp;&nbsp;to perform <input type="number" class="input-number" :min=3 v-model="taskCount"> tasks
+    <br>&nbsp;&nbsp;to perform <input type="number" class="input-number" :min=0 v-model="taskCount"> tasks
     <br>&nbsp;&nbsp;for <input type="number" class="input-number" :min=0 v-model="resourceCount"> resources
     <br>
     <textarea id="result-box" v-model="result"></textarea>
@@ -109,16 +109,16 @@
             },
             taskCount: function (val) {
                 const count = this.calCount("Task")
-                if (this.taskCount < 3) {
-                    alert("The quantity of task cannot be less than 3.")
-                    this.taskCount = 3
-                } else {
+                // if (this.taskCount < 3) {
+                //     alert("The quantity of task cannot be less than 3.")
+                //     this.taskCount = 3
+                // } else {
                     if (count < val) {
                         this.addDependum("Task", val - count)
                     } else if (count > val) {
                         this.delDependum("Task", count - val)
                     }
-                }
+                // }
             },
             resourceCount: function (val) {
                 const count = this.calCount("Resource")

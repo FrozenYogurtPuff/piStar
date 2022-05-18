@@ -32,7 +32,7 @@
                                                                                  v-model="actorBName">
     <br>&nbsp;&nbsp;to achieve <input type="number" class="input-number" :min=0 v-model="goalCount"> goals
     <br>&nbsp;&nbsp;to perform <input type="number" class="input-number" :min=0 v-model="taskCount"> tasks
-    <br>&nbsp;&nbsp;for <input type="number" class="input-number" :min=3 v-model="resourceCount"> resources
+    <br>&nbsp;&nbsp;for <input type="number" class="input-number" :min=0 v-model="resourceCount"> resources
     <br>
     <textarea id="result-box" v-model="result"></textarea>
 </div>
@@ -118,16 +118,16 @@
             },
             resourceCount: function (val) {
                 const count = this.calCount("Resource")
-                if (this.resourceCount < 3) {
-                    alert("The quantity of resource cannot be less than 3.")
-                    this.resourceCount = 3
-                } else {
+                // if (this.resourceCount < 3) {
+                //     alert("The quantity of resource cannot be less than 3.")
+                //     this.resourceCount = 3
+                // } else {
                     if (count < val) {
                         this.addDependum("Resource", val - count)
                     } else if (count > val) {
                         this.delDependum("Resource", count - val)
                     }
-                }
+                // }
             }
         },
         methods: {
