@@ -97,7 +97,7 @@ export default Vue.extend({
       // https://github.com/vuetifyjs/vuetify/issues/10765
       this.$nextTick(() => {
         if (this.$refs.autocomplete) {
-          ;this.$refs.autocomplete.selectedItems = []
+          this.$refs.autocomplete.selectedItems = []
         }
       })
       this.$emit('close')

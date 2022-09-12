@@ -16,38 +16,38 @@
         @contextmenu:entity="deleteEntity"
         @contextmenu:relation="deleteRelation"
     />
-<!--    <labeling-menu-->
-<!--        :opened="entityMenuOpened"-->
-<!--        :x="x"-->
-<!--        :y="y"-->
-<!--        :selected-label="currentLabel"-->
-<!--        :labels="entityLabels"-->
-<!--        @close="cleanUp"-->
-<!--        @click:label="addOrUpdateEntity"-->
-<!--    />-->
-<!--    <labeling-menu-->
-<!--        :opened="relationMenuOpened"-->
-<!--        :x="x"-->
-<!--        :y="y"-->
-<!--        :selected-label="currentRelationLabel"-->
-<!--        :labels="relationLabels"-->
-<!--        @close="cleanUp"-->
-<!--        @click:label="addOrUpdateRelation"-->
-<!--    />-->
+    <labeling-menu
+        :opened="entityMenuOpened"
+        :x="x"
+        :y="y"
+        :selected-label="currentLabel"
+        :labels="entityLabels"
+        @close="cleanUp"
+        @click:label="addOrUpdateEntity"
+    />
+    <labeling-menu
+        :opened="relationMenuOpened"
+        :x="x"
+        :y="y"
+        :selected-label="currentRelationLabel"
+        :labels="relationLabels"
+        @close="cleanUp"
+        @click:label="addOrUpdateRelation"
+    />
   </div>
 </template>
 
 <script>
 import Vue from 'vue'
 import VAnnotator from 'v-annotator'
-// import LabelingMenu from './LabelingMenu.vue'
+import LabelingMenu from './LabelingMenu.vue'
 import 'vue-virtual-scroller/dist/vue-virtual-scroller.css'
 
 
 export default Vue.extend({
   components: {
     VAnnotator,
-    // LabelingMenu
+    LabelingMenu
   },
 
   props: {
@@ -188,6 +188,7 @@ export default Vue.extend({
       })
     },
 
+    // 选中区域时，判断是否存在快捷键添加（if段），若无则显示添加菜单
     handleAddEvent(e, startOffset, endOffset) {
       this.setOffset(startOffset, endOffset)
       if (this.selectedLabel) {
@@ -211,14 +212,17 @@ export default Vue.extend({
       this.showRelationLabelMenu(e)
     },
 
+    // 点击标签，添加元素
     addOrUpdateEntity(labelId) {
       if (labelId) {
+        // 如果是通过点击已有实体触发的，在此前已经记录到 this.entity，直接更新
         if (this.entity) {
           this.updateEntity(labelId)
         } else {
           this.addEntity(labelId)
         }
       } else {
+        // 如果没有 labelId，说明是触发列表后点了标签旁的小叉，删除这个实体
         this.deleteEntity(this.entity)
       }
       this.cleanUp()
