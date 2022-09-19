@@ -28,6 +28,7 @@ https://github.com/jhcp/pistar
     <link href="app/ui/lib/bootstrap3-editable/bootstrap-editable.css" rel="stylesheet"> <!-- x-editable -->
     <!-- tool styles -->
     <link href="pistar.css" rel="stylesheet">
+    <link href="app/annotate/dist/style.css" rel="stylesheet">
 </head>
 
 <body>
@@ -319,6 +320,9 @@ https://github.com/jhcp/pistar
 
     </div>
 
+    <div id="annotate">
+        <!-- Vue.js mount point -->
+    </div>
 </div>
 
 
@@ -593,9 +597,8 @@ https://github.com/jhcp/pistar
 <script src="language/constraints.js"></script>
 <script src="language/ui.metamodel.js"></script>
 
-<!-- insert your plugin(s) here, after this line -->
-
-<!-- end of plugin(s) area -->
+<!-- TODO: Chrysant Annotator -->
+<script src="app/annotate/dist/annotate.umd.js"></script>
 
 <script src="app/ui/main.js"></script>
 
