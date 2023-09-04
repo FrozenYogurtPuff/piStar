@@ -3,5 +3,8 @@ module.exports = defineConfig({
   transpileDependencies: [
     'vuetify'
   ],
-  publicPath: './'
+  publicPath: './',
+  configureWebpack: {
+    devtool: 'source-map'
+  }
 })

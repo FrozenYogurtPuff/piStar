@@ -2,12 +2,12 @@
   <div>
   <el-header>
     <el-steps :space="200" :active="step" finish-status="success" simple>
-      <el-step title="上传需求文稿" icon="el-icon-edit"></el-step>
-      <el-step title="主体实体抽取" icon="el-icon-plus"></el-step>
-      <el-step title="主体关系抽取" icon="el-icon-plus"></el-step>
-      <el-step title="意图实体抽取" icon="el-icon-plus"></el-step>
-      <el-step title="意图实体填充" icon="el-icon-plus"></el-step>
-      <el-step title="完成建模" icon="el-icon-picture"></el-step>
+      <el-step title="Input Sentence" icon="el-icon-edit"></el-step>
+      <el-step title="Actor Entity" icon="el-icon-plus"></el-step>
+      <el-step title="Actor Relation" icon="el-icon-plus"></el-step>
+      <el-step title="Intention Entity" icon="el-icon-plus"></el-step>
+      <el-step title="Intention Matching" icon="el-icon-plus"></el-step>
+      <el-step title="Finish" icon="el-icon-picture"></el-step>
     </el-steps>
   </el-header>
 
@@ -21,7 +21,7 @@
               v-model="text"
               :rows="12"
               type="textarea"
-              placeholder="请输入需求文本"
+              placeholder="Please input req text..."
           >
           </el-input>
         </el-col>
@@ -31,7 +31,7 @@
       <el-row :gutter="20">
         <el-col :span="2" :offset="18">
           <el-button color="#246B29" plain @click="nextToAE">
-            下一步
+            Next
           </el-button>
         </el-col>
       </el-row>
@@ -65,12 +65,12 @@
       <el-row :gutter="20">
         <el-col :span="2" :offset="16">
           <el-button color="#246B29" plain @click="prevToBegin">
-            上一步
+            Back
           </el-button>
         </el-col>
         <el-col :span="2">
           <el-button color="#246B29" plain @click="nextToAR">
-            下一步
+            Next
           </el-button>
         </el-col>
       </el-row>
@@ -104,12 +104,12 @@
       <el-row :gutter="20">
         <el-col :span="2" :offset="16">
           <el-button color="#246B29" plain @click="prevToAE">
-            上一步
+            Back
           </el-button>
         </el-col>
         <el-col :span="2">
           <el-button color="#246B29" plain @click="nextToIE">
-            下一步
+            Next
           </el-button>
         </el-col>
       </el-row>
@@ -121,46 +121,51 @@
     <el-main>
       <el-row :gutter="20">
         <el-col :span="16" :offset="4">
+<!--          <entity-editor data-app-->
+<!--            :rtl="false"-->
+<!--            :text="this.text"-->
+<!--            :entities="this.mockAnnotator.IE.entities"-->
+<!--            :entity-labels="this.mockAnnotator.IE.entityLabels"-->
+<!--            :relations="this.mockAnnotator.IE.relations"-->
+<!--            :relation-labels="this.mockAnnotator.IE.relationLabels"-->
+<!--            :allow-overlapping="false"-->
+<!--            :grapheme-mode="false"-->
+<!--            :selected-label="null"-->
+<!--            :relation-mode="this.mockAnnotator.IE.switchRelation"-->
+<!--            @addEntity="handleIEAddSpan"-->
+<!--            @addRelation="handleIEAddRelation"-->
+<!--            @click:entity="handleIEEntityChange"-->
+<!--            @contextmenu:entity="handleIEDeleteSpan"-->
+<!--            @contextmenu:relation="handleIEDeleteRelation"-->
+<!--          />-->
           <entity-editor data-app
-            :rtl="false"
-            :text="this.text"
-            :entities="this.mockAnnotator.IE.entities"
-            :entity-labels="this.mockAnnotator.IE.entityLabels"
-            :relations="this.mockAnnotator.IE.relations"
-            :relation-labels="this.mockAnnotator.IE.relationLabels"
-            :allow-overlapping="false"
-            :grapheme-mode="false"
-            :selected-label="null"
-            :relation-mode="this.mockAnnotator.IE.switchRelation"
-            @addEntity="handleIEAddSpan"
-            @addRelation="handleIEAddRelation"
-            @click:entity="handleIEEntityChange"
-            @contextmenu:entity="handleIEDeleteSpan"
-            @contextmenu:relation="handleIEDeleteRelation"
+              :rtl="false"
+              :text="this.text"
+              :entities="this.mockAnnotator.IE.entities"
+              :entity-labels="this.mockAnnotator.IE.entityLabels"
+              :relations="this.mockAnnotator.IE.relations"
+              :relation-labels="this.mockAnnotator.IE.relationLabels"
+              :allow-overlapping="true"
+              :grapheme-mode="false"
+              :selected-label="null"
+              :relation-mode="false"
+              @addEntity="handleIEAddSpan"
+              @click:entity="handleIEEntityChange"
+              @contextmenu:entity="handleIEDeleteSpan"
           />
         </el-col>
       </el-row>
     </el-main>
     <el-footer>
       <el-row :gutter="20">
-        <el-col :span="4" :offset="4">
-          <el-switch
-              style="display: block"
-              v-model="mockAnnotator.IE.switchRelation"
-              active-color="#5A9CF8"
-              inactive-color="#5A9CF8"
-              active-text="添加关系"
-              inactive-text="添加主体">
-          </el-switch>
-        </el-col>
-        <el-col :span="2" :offset="10">
+        <el-col :span="2" :offset="16">
           <el-button color="#246B29" plain @click="prevToAR">
-            上一步
+            Back
           </el-button>
         </el-col>
         <el-col :span="2">
           <el-button color="#246B29" plain @click="nextToII">
-            下一步
+            Next
           </el-button>
         </el-col>
       </el-row>
@@ -172,26 +177,64 @@
     <el-main>
       <el-row :gutter="20">
         <el-col :span="16" :offset="4">
-          请选取对应的意图进行安置：
+          {{text}}
         </el-col>
       </el-row>
-      <div v-for="item in mockAnnotator.II.phrases" :key='item.id'>
+      <el-row :gutter="20">
+        <el-col :span="16" :offset="4">
+          &NonBreakingSpace;
+        </el-col>
+      </el-row>
+      <el-row :gutter="20">
+        <el-col :span="16" :offset="4">
+          Please match corresponding intentions（texts are editable）：
+        </el-col>
+      </el-row>
+      <el-row :gutter="20">
+        <el-col :span="16" :offset="4">
+          &NonBreakingSpace;
+        </el-col>
+      </el-row>
+      <div v-for="item in mockAnnotator.II.select" :key='item.id'>
         <el-row :gutter="20">
-          <el-col :span="3" :offset="6">
-            <el-input
-              v-model="item.text"
-              :disabled="true">
-            </el-input>
-          </el-col>
-          <el-col :span="3" :offset="1">
-            <el-select v-model="item.ans" placeholder="请选择">
+          <el-col :span="5" :offset="6">
+            <el-select allow-create filterable v-model="item.pid" placeholder="请选择（可编辑）" style="width:100%">
               <el-option
-                  v-for="item in mockAnnotator.II.options"
-                  :key="item.rid"
-                  :label="item.label"
-                  :value="item.value">
+                  v-for="it in mockAnnotator.II.phrases"
+                  :key="it.id"
+                  :label="it.text"
+                  :value="it.id">
               </el-option>
             </el-select>
+          </el-col>
+          <el-col :span="5" :offset="0">
+            <el-select v-model="item.oid" placeholder="请选择" style="width:100%">
+              <el-option
+                  v-for="it in mockAnnotator.II.options"
+                  :key="it.rid"
+                  :label="it.label"
+                  :value="it.value">
+              </el-option>
+            </el-select>
+          </el-col>
+          <el-col :span="2" :offset="0">
+             <el-button plain @click="delIISelect(item.id)">
+              x
+            </el-button>
+          </el-col>
+        </el-row>
+      </div>
+      <div>
+        <el-row :gutter="20">
+        <el-col :span="16" :offset="4">
+          &NonBreakingSpace;
+        </el-col>
+      </el-row>
+        <el-row :gutter="20">
+          <el-col :span="7" :offset="11">
+            <el-button plain @click="addIISelect">
+              +
+            </el-button>
           </el-col>
         </el-row>
       </div>
@@ -200,12 +243,12 @@
       <el-row :gutter="20">
         <el-col :span="2" :offset="16">
           <el-button color="#246B29" plain @click="prevToIE">
-            上一步
+            Back
           </el-button>
         </el-col>
         <el-col :span="2">
           <el-button color="#246B29" plain @click="nextToFin">
-            下一步
+            Next
           </el-button>
         </el-col>
       </el-row>
@@ -217,7 +260,7 @@
     <el-main>
       <el-row :gutter="20">
         <el-col :span="16" :offset="4">
-          请确认您要生成的iStar模型：
+          Please confirm the iStar model:
         </el-col>
       </el-row>
       <el-row :gutter="20">
@@ -227,7 +270,7 @@
       </el-row>
       <el-row :gutter="20">
         <el-col :span="16" :offset="4">
-          实体识别
+          Entity extraction
         </el-col>
       </el-row>
       <el-row :gutter="20">
@@ -255,7 +298,7 @@
       </el-row>
       <el-row :gutter="20">
         <el-col :span="16" :offset="4">
-          关系识别
+          Relation extraction
         </el-col>
       </el-row>
       <el-row :gutter="20">
@@ -265,17 +308,17 @@
               style="width: 100%">
             <el-table-column
                 prop="type"
-                label="类型"
+                label="Type"
                 width="180">
             </el-table-column>
             <el-table-column
                 prop="src"
-                label="源自"
+                label="From"
                 width="180">
             </el-table-column>
             <el-table-column
                 prop="dest"
-                label="目的"
+                label="To"
                 width="180">
             </el-table-column>
           </el-table>
@@ -288,7 +331,7 @@
       </el-row>
       <el-row :gutter="20">
         <el-col :span="16" :offset="4">
-          意图安置
+          Intention matching
         </el-col>
       </el-row>
       <el-row :gutter="20">
@@ -297,18 +340,23 @@
               :data="intentionTable"
               style="width: 100%">
             <el-table-column
-                prop="type"
-                label="名称"
+                prop="name"
+                label="Name"
                 width="180">
             </el-table-column>
             <el-table-column
-                prop="name"
-                label="类型"
+                prop="pType"
+                label="Intention type"
+                width="180">
+            </el-table-column>
+            <el-table-column
+                prop="dType"
+                label="Destination Type"
                 width="180">
             </el-table-column>
             <el-table-column
                 prop="dest"
-                label="目标"
+                label="Destination"
                 width="180">
             </el-table-column>
           </el-table>
@@ -319,7 +367,7 @@
       <el-row :gutter="20">
         <el-col :span="2" :offset="18">
           <el-button color="#246B29" plain @click="prevToII">
-            上一步
+            Back
           </el-button>
         </el-col>
       </el-row>
@@ -364,11 +412,13 @@ export default {
       }],
       intentionTable: [{
         name: 'do homework',
-        type: 'dependency',
+        pType: 'Goal',
+        dType: 'dependency',
         dest: 'The teacher - Anna',
       }, {
         name: 'borrow classroom',
-        type: 'inside',
+        pType: 'Goal',
+        dType: 'inside',
         dest: 'The headteacher'
       }],
       mockAnnotator: {
@@ -489,38 +539,40 @@ export default {
           }],
           entityLabels: [{
             id: 1,
-            text: "Verb",
+            text: "Goal",
             prefixKey: null,
             suffixKey: null,
             backgroundColor: '#66ffcc',
             textColor: '#ccbbaa'
           }, {
             id: 2,
-            text: "Obj",
+            text: "Quality",
             prefixKey: null,
             suffixKey: null,
             backgroundColor: '#eeff22',
             textColor: '#ccbbaa'
           }],
-          relations: [{
-            id: 123,
-            fromId: 1,
-            toId: 2,
-            labelId: 11
-          }, {
-            id: 124,
-            fromId: 3,
-            toId: 4,
-            labelId: 11
-          }],
-          relationLabels: [{
-            id: 11,
-            text: "Verb-Obj",
-            prefixKey: null,
-            suffixKey: null,
-            backgroundColor: '#548631',
-            textColor: '#ccbbaa'
-          }],
+          // relations: [{
+          //   id: 123,
+          //   fromId: 1,
+          //   toId: 2,
+          //   labelId: 11
+          // }, {
+          //   id: 124,
+          //   fromId: 3,
+          //   toId: 4,
+          //   labelId: 11
+          // }],
+          // relationLabels: [{
+          //   id: 11,
+          //   text: "Verb-Obj",
+          //   prefixKey: null,
+          //   suffixKey: null,
+          //   backgroundColor: '#548631',
+          //   textColor: '#ccbbaa'
+          // }],
+          relations: [],
+          relationLabels: [],
           selectedEntities: []
         },
         II: {
@@ -531,18 +583,30 @@ export default {
             label: 'The teacher - Anna',
           }, {
             value: 1,
+            type: 'inside',
+            rid: 1,
             label: 'The teacher'
           }, {
             value: 2,
+            type: 'inside',
+            rid: 2,
             label: 'Anna'
           }, {
             value: 3,
+            type: 'inside',
+            rid: 3,
             label: 'The headteacher'
           }],
           phrases: [{
             id: 0,
-            text: 'do homework',
-            ans: 0
+            type: 'Goal',
+            text: 'do homework'
+          }],
+          select: [{
+            id: 0,
+            pid: 0,
+            text: '',
+            oid: 0
           }]
         }
       }
@@ -559,7 +623,7 @@ export default {
         spinner: 'el-icon-loading',
         background: 'rgba(0, 0, 0, 0.7)'
       });
-      axios.post("http://127.0.0.1:5050/ae", {
+      axios.post("http://" + window.location.hostname + ":5050/ae", {
         // text: "The teacher asks Anna to do the homework. The headteacher needs to borrow the classroom in advance."
         text: this.text
       }).then(response => {
@@ -605,7 +669,7 @@ export default {
         spinner: 'el-icon-loading',
         background: 'rgba(0, 0, 0, 0.7)'
       });
-      axios.post("http://127.0.0.1:5050/ar", {
+      axios.post("http://" + window.location.hostname + ":5050/ar", {
         // text: "The teacher asks Anna to do the homework. The headteacher needs to borrow the classroom in advance."
         text: this.text,
         entity: this.mockAnnotator.AE.entities
@@ -656,49 +720,29 @@ export default {
         spinner: 'el-icon-loading',
         background: 'rgba(0, 0, 0, 0.7)'
       });
-      axios.post("http://127.0.0.1:5050/ie", {
-        // text: "The teacher asks Anna to do the homework. The headteacher needs to borrow the classroom in advance."
-        text: this.text
-      }).then(response => {
-        let data = response.data
-        // console.log(data)
-        this.mockAnnotator.IE.entities = []
-        this.mockAnnotator.IE.relations = []
-        let cur_idx = 1;
-        for (let idx in data) {
-          let pair = data[idx]
-          let verb_idx = -1
-          // console.log(idx)
-          // console.log(pair)
-          for (let cur in pair) {
-            let item = pair[cur]
-            let tag_id = (item[0] === "Core") ? 1 : 2;
-            if (tag_id === 1) {
-              verb_idx = cur_idx;
-            }
+
+      // If not empty, just use it
+        axios.post("http://" + window.location.hostname + ":5050/ie", {
+          // text: "The teacher asks Anna to do the homework. The headteacher needs to borrow the classroom in advance."
+          text: this.text
+        }).then(response => {
+          let data = response.data
+          this.mockAnnotator.IE.entities = []
+
+          for (let idx in data) {
+            let item = data[idx]
+            let tag_id = (item[0] === "Goal") ? 1 : 2
             this.mockAnnotator.IE.entities.push({
-              id: cur_idx,
+              id: idx,
               label: tag_id,
               user: 0,
               startOffset: item[1],
               endOffset: item[2]
             })
-            if (tag_id === 2) {
-              // console.log("!" + verb_idx + " " + cur_idx)
-              this.mockAnnotator.IE.relations.push({
-                id: cur_idx,
-                fromId: verb_idx,
-                toId: cur_idx,
-                labelId: 11
-              })
-            }
-            cur_idx++;
           }
-        }
-        // console.log(this.mockAnnotator.IE.entities)
-        loading.close();
-        this.step++;
-      })
+        })
+      loading.close();
+      this.step++;
     },
     prevToAR() {
       if (this.step !== 3) {
@@ -726,27 +770,38 @@ export default {
         background: 'rgba(0, 0, 0, 0.7)'
       });
       this.mockAnnotator.II.phrases = []
-      for (let key in this.mockAnnotator.IE.relations) {
-        let item = this.mockAnnotator.IE.relations[key]
-        let text = ""
-        let value = item.id
-        this.mockAnnotator.IE.entities.forEach(elem => {
-          if (elem.id === item.fromId) {
-            text += (this.text.substring(elem.startOffset, elem.endOffset) + " ")
-          }
-        })
-        this.mockAnnotator.IE.entities.forEach(elem => {
-          if (elem.id === item.toId) {
-            text += this.text.substring(elem.startOffset, elem.endOffset)
-          }
-        })
-        // console.log(text)
+
+      for (let key in this.mockAnnotator.IE.entities) {
+        let elem = this.mockAnnotator.IE.entities[key]
         this.mockAnnotator.II.phrases.push({
-          id: value,
-          text: text,
-          ans: 0
+          id: elem.id,
+          type: elem.label === 1 ? "Goal" : "Quality",
+          text: this.text.substring(elem.startOffset, elem.endOffset)
         })
       }
+
+      // for (let key in this.mockAnnotator.IE.relations) {
+      //   let item = this.mockAnnotator.IE.relations[key]
+      //   let text = ""
+      //   let value = item.id
+      //   this.mockAnnotator.IE.entities.forEach(elem => {
+      //     if (elem.id === item.fromId) {
+      //       text += (this.text.substring(elem.startOffset, elem.endOffset) + " ")
+      //     }
+      //   })
+      //   this.mockAnnotator.IE.entities.forEach(elem => {
+      //     if (elem.id === item.toId) {
+      //       text += this.text.substring(elem.startOffset, elem.endOffset)
+      //     }
+      //   })
+      //   // console.log(text)
+      //   this.mockAnnotator.II.phrases.push({
+      //     id: value,
+      //     text: text,
+      //   })
+      // }
+
+
 
       this.mockAnnotator.II.options = []
       let value = 0
@@ -782,6 +837,28 @@ export default {
           label: this.text.substring(item.startOffset, item.endOffset),
         })
         value += 1
+      }
+
+      this.mockAnnotator.II.select = []
+      let optionLength = this.mockAnnotator.II.options.length
+      let phraseLength = this.mockAnnotator.II.phrases.length
+      let minLength = optionLength > phraseLength ? phraseLength : optionLength
+      for (let i = 0; i < minLength; i++) {
+        if (minLength === optionLength) {
+          this.mockAnnotator.II.select.push({
+            id: i,
+            pid: this.mockAnnotator.II.phrases[0].id,
+            text: "",
+            oid: this.mockAnnotator.II.options[i].value
+          })
+        } else {
+          this.mockAnnotator.II.select.push({
+            id: i,
+            pid: this.mockAnnotator.II.phrases[i].id,
+            text: "",
+            oid: this.mockAnnotator.II.options[0].value
+          })
+        }
       }
 
       loading.close();
@@ -845,13 +922,29 @@ export default {
 
       // 构建意图安置列表
       this.intentionTable = []
-      this.mockAnnotator.II.phrases.forEach((elem) => {
-        let text = elem.text
-        let el = this.mockAnnotator.II.options.find(el => el.value === elem.ans)
+      this.mockAnnotator.II.select.forEach((elem) => {
+        let text
+        let pType
+        let phrase = this.mockAnnotator.II.phrases.find(el => el.id === elem.pid)
+        if (!phrase) {
+          text = elem.pid
+          pType = 'Goal'
+          elem.pid = -1
+          elem.text = text
+        } else {
+          text = phrase.text
+          pType = phrase.type
+        }
+
+        let option = this.mockAnnotator.II.options.find(el => el.value === elem.oid)
+        let dType = option.type
+        let dest = option.label
+
         this.intentionTable.push({
           name: text,
-          type: el.type,
-          dest: el.label,
+          pType: pType,
+          dType: dType,
+          dest: dest,
         })
       })
 
@@ -874,6 +967,13 @@ export default {
         background: 'rgba(0, 0, 0, 0.7)'
       });
       setTimeout(() => {
+        for (let key in this.mockAnnotator.II.select) {
+          let item = this.mockAnnotator.II.select[key]
+          if (item.pid === -1) {
+            item.pid = item.text
+          }
+        }
+
         loading.close();
         this.step--;
       }, 200);
@@ -900,7 +1000,7 @@ export default {
         }
       })
       this.mockAnnotator.AE.entities.push({
-        id: max_idx,
+        id: max_idx + 1,
         label: lId,
         user: 0,
         startOffset: start,
@@ -920,14 +1020,13 @@ export default {
           object.splice(index, 1);
         }
       })
-      this.mockAnnotator.IE.relations.forEach((elem, index, object) => {
-        if (elem.fromId === aId || elem.toId === aId) {
-          object.splice(index, 1);
-        }
-      })
+      // this.mockAnnotator.IE.relations.forEach((elem, index, object) => {
+      //   if (elem.fromId === aId || elem.toId === aId) {
+      //     object.splice(index, 1);
+      //   }
+      // })
     },
     handleIEAddSpan(start, end, lId) {
-      // console.log(this.mockAnnotator.IE.entities)
       let max_idx = this.mockAnnotator.IE.entities.length;
       this.mockAnnotator.IE.entities.forEach((elem) => {
         if (elem.id > max_idx) {
@@ -941,26 +1040,25 @@ export default {
         startOffset: start,
         endOffset: end
       })
-      // console.log(this.mockAnnotator.IE.entities)
     },
-    handleIEAddRelation(start, end, lId) {
-      // console.log(this.mockAnnotator.IE.entities)
-      this.mockAnnotator.IE.entities.forEach((elem) => {
-        if (elem.id === start && elem.label !== 1) {
-          throw 'Please start with Verb'
-        }
-        if (elem.id === end && elem.label !== 2) {
-          throw 'Please end with Obj'
-        }
-      })
-      this.mockAnnotator.IE.relations.push({
-        id: end,
-        fromId: start,
-        toId: end,
-        labelId: lId
-      })
-      // console.log(this.mockAnnotator.IE.relations)
-    },
+    // handleIEAddRelation(start, end, lId) {
+    //   // console.log(this.mockAnnotator.IE.entities)
+    //   this.mockAnnotator.IE.entities.forEach((elem) => {
+    //     if (elem.id === start && elem.label !== 1) {
+    //       throw 'Please start with Verb'
+    //     }
+    //     if (elem.id === end && elem.label !== 2) {
+    //       throw 'Please end with Obj'
+    //     }
+    //   })
+    //   this.mockAnnotator.IE.relations.push({
+    //     id: end,
+    //     fromId: start,
+    //     toId: end,
+    //     labelId: lId
+    //   })
+    //   // console.log(this.mockAnnotator.IE.relations)
+    // },
     handleARAddRelation(start, end, lId) {
       // console.log(this.mockAnnotator.AE.entities)
       this.mockAnnotator.AR.relations.push({
@@ -985,11 +1083,31 @@ export default {
         }
       })
     },
-    handleIEDeleteRelation(aId) {
-      this.mockAnnotator.IE.relations.forEach((elem, index, object) => {
-        if (elem.id === aId) {
-          object.splice(index, 1);
-        }
+    // handleIEDeleteRelation(aId) {
+    //   this.mockAnnotator.IE.relations.forEach((elem, index, object) => {
+    //     if (elem.id === aId) {
+    //       object.splice(index, 1);
+    //     }
+    //   })
+    // },
+    delIISelect(selectId) {
+      let index = this.mockAnnotator.II.select.findIndex(elem => elem.id === selectId)
+      this.mockAnnotator.II.select.splice(index, 1)
+    },
+    addIISelect() {
+      if (this.mockAnnotator.II.options.length === 0) {
+        return;
+      }
+      if (this.mockAnnotator.II.phrases.length === 0) {
+        return;
+      }
+
+      let prevId = this.mockAnnotator.II.select.slice(-1)[0].id
+      this.mockAnnotator.II.select.push({
+        id: prevId + 1,
+        pid: this.mockAnnotator.II.phrases[0].id,
+        oid: this.mockAnnotator.II.options[0].value,
+        text: ""
       })
     }
   }
@@ -1008,5 +1126,9 @@ div {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+.el-step__title {
+  font-size: 14px !important;
 }
 </style>

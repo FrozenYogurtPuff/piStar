@@ -10,5 +10,5 @@ to gather usage data (Google Analytics) and to add privacy settings.
 3. Add Privacy settings buttons on the options tab
 4. Add app/ui/privacy.js as a dependency
 
-### main.js
+### main.ts
 1. Add ```ui.startupPrivacySettings();```
