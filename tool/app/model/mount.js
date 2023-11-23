@@ -147,6 +147,7 @@ function paint() {
     }
 }
 
+// TODO: Add elements with layout, just like template addition
 $("#add-model-from-srs").click(function () {
     window.addEventListener('message', function (e) {
         const data = e.data
