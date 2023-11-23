@@ -19,6 +19,12 @@ var ui = function() {
                     ADD_CONTAINER: 101,
                     ADD_NODE: 102,
                     ADD_LINK: 103,
+                    ADD_BY_TEXT: 104,
+                    ADD_LINK_BY_TEXT: 105,
+                    ADD_LINK_BY_TEXT_ACTOR_1: 106,
+                    ADD_LINK_BY_TEXT_ACTOR_2: 107,
+                    ADD_INTENTION_BY_TEXT: 108,
+                    ADD_REFINEMENTS_BY_TEXT: 109,
                     data: {
                         button: null, /* the 'add button' that is currently selected */
                         typeNameToAdd: null, /* the name of the type that is to be added */
@@ -27,7 +33,10 @@ var ui = function() {
                         linkValue: null,
                         isLinkSourceUndefined: function () {
                             return this.linkSourceView === null;
-                        }
+                        },
+                        intentionsToAdd: [],
+                        intentionAddCellID: null,
+                        addRefinementTo: null,
                     }
                 },
                 VIEWING: 2,
@@ -275,6 +284,20 @@ ui.defineInteractions = function () {
                     y: y - bbox.height/2
                 }});
         }
+        if (ui.states.editor.current === ui.states.editor.ADDING.ADD_BY_TEXT) {
+            ui.setInitPosition(x, y)
+            ui.addElements()
+            ui.clearElements()
+        }
+        if (ui.states.editor.current === ui.states.editor.ADDING.ADD_LINK_BY_TEXT) {
+            ui.addLinkByText(x, y)
+        }
+        if (ui.states.editor.current === ui.states.editor.ADDING.ADD_LINK_BY_TEXT_ACTOR_1) {
+            ui.addLinkByTextOneActor(1, x, y)
+        }
+        if (ui.states.editor.current === ui.states.editor.ADDING.ADD_LINK_BY_TEXT_ACTOR_2) {
+            ui.addLinkByTextOneActor(2, x, y)
+        }
     });
 
     istar.paper.on('cell:mouseover', function (cellView, evt, x, y) {
@@ -409,6 +432,13 @@ ui.defineInteractions = function () {
     });
     istar.paper.on('cell:pointerup', function (cellView, evt, x, y) {
         var currentAddingElement = ui.states.editor.ADDING.data.typeNameToAdd;
+
+        if (ui.states.editor.current === ui.states.editor.ADDING.ADD_INTENTION_BY_TEXT) {
+            ui.addIntentionByText(cellView, x, y)
+        }
+        if (ui.states.editor.current === ui.states.editor.ADDING.ADD_REFINEMENTS_BY_TEXT) {
+            ui.addRefinementLinkByText(ui.states.editor.ADDING.data.typeNameToAdd, cellView, x, y)
+        }
 
         if (ui.states.editor.isAddingNode()) {
             ui.addElementOnContainer(cellView, {position: {x: x, y: y}});
@@ -662,8 +692,15 @@ ui.addElementOnContainer = function (cellView, options) {
             var bbox = (new istar.metamodel.nodes[currentAddingElement].shapeObject()).getBBox();
             options.position.x -= bbox.width/2;
             options.position.y -= bbox.height/2;
+            let addingElement = currentAddingElement
+            if (currentAddingElement === 'To-Be-Refined') {
+                addingElement = 'ToBeRefined'
+            }
+            var element = ui.addNodeInPlace(cellView.model, istar['add' + addingElement], options);
 
-            var element = ui.addNodeInPlace(cellView.model, istar['add' + currentAddingElement], options);
+            if (options.name) {
+                element.prop('name', options.name)
+            }
 
             if (istar.metamodel.nodes[currentAddingElement].customProperties) {
                 element.prop('customProperties', istar.metamodel.nodes[currentAddingElement].customProperties);
@@ -678,6 +715,7 @@ ui.addElementOnContainer = function (cellView, options) {
         console.log(e);
         ui.states.editor.transitionTo(ui.states.editor.VIEWING);
     }
+    return element
 };
 ui.addLinkBetweenContainers = function (newLink, targetCellView) {
     'use strict';
@@ -701,6 +739,27 @@ ui.addDependency = function (source, dependencyType, target) {
     var node = '';
     var position = {x: 10, y: 10};
     var text = 'Dependum';
+
+    var dependumType = dependencyType.replace('DependencyLink', '')
+    if (dependumType === 'To-Be-Refined') {dependumType = 'ToBeRefined';}
+    node = istar['add' + dependumType](text, position);
+
+    var links = istar.addDependency(source, node, target);
+    links[0].on('change:vertices', ui._toggleSmoothness);
+    links[1].on('change:vertices', ui._toggleSmoothness);
+
+    ui.setupDependencyRemoval(links);
+
+    node.prop('customProperties/Description', '');
+    ui.selectCell(node);
+}
+
+ui.addDependencyWithName = function (source, dependencyType, target, name, x, y) {
+    'use strict';
+
+    var node = '';
+    var position = {x: x, y: y};
+    var text = name;
 
     var dependumType = dependencyType.replace('DependencyLink', '');
     node = istar['add' + dependumType](text, position);

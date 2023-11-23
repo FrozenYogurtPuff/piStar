@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Add AND/OR Refinement</title>
+    <script src="../../istarcore/lib/lodash.min.js"></script>
+    <script src="../../ui/lib/vue.global.prod.js"></script>
+</head>
+<style>
+    #app {
+        margin: 0;
+    }
+
+    .input-text {
+        width: 120px;
+    }
+
+    textarea {
+        margin-top: 20px;
+        width: 100%;
+        height: 200px;
+    }
+
+    label {
+        margin-right: 20px;
+    }
+</style>
+<body>
+<div id="app">
+    <div>
+        <input type="radio" id="and-refinement"
+               name="refinement" value="and">
+        <label for="and-refinement">AND-Refinement</label>
+        <input type="radio" id="or-refinement"
+               name="refinement" value="or">
+        <label for="or-refinement">OR-Refinement</label>
+    </div>
+    <textarea id="result-box" v-model="result"></textarea>
+</div>
+
+<script>
+    Vue.createApp({
+        data() {
+            return {
+                iType: null,
+                iName: null,
+                result: "Goal: goal 1\n" +
+                    "Task: task 1"
+            }
+        },
+        watch: {
+            result: function (newVal, oldVal) {
+                const val = newVal.trim()
+                const lines = val.replace('\n\n', '\n').split('\n')
+                const result = this.checkDependency(lines[0])
+                this.text = lines.slice(1).join('\n')
+                if (result.isValid) {
+                    this.actorName = result.actor_name
+                    this.actorType = result.actor_type
+                }
+            },
+            actorType: function (val) {
+                this.genResult()
+            },
+            actorName: function (val) {
+                this.genResult()
+            },
+        },
+        methods: {
+            genResult: function () {
+                let s = `Goals or tasks in ${this.actorType}: ${this.actorName}\n`
+                s += this.text
+                this.result = s
+            },
+            calCount: function (type) {
+                let count = 0
+                _.forEach(this.dependums, function (val) {
+                    if (val.type === type) count++
+                })
+                return count
+            },
+            checkDependency: function (line) {
+                let result = {
+                    actor_type: null,
+                    actor_name: null,
+                    isValid: false
+                }
+                line = line.trim()
+                const actors = new Set(['Agent', 'Role', 'Actor'])
+                try {
+                    const actor_type = line.substring(line.indexOf('in ') + 3, line.indexOf(':'));
+                    let actor_name = ""
+                    if (line.indexOf(': ') !== -1) {
+                        actor_name = line.substring(line.indexOf(': ') + 2);
+                    }
+                    result = {
+                        actor_type: actor_type,
+                        actor_name: actor_name,
+                    }
+                    result.isValid = actors.has(actor_type);
+                } catch (e) {
+                    result.isValid = false
+                }
+                return result
+            }
+        }
+    }).mount('#app')
+</script>
+</body>
+</html>

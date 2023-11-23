@@ -129,6 +129,8 @@ istar.setupMetamodel = function (metamodel) {
             createAddElementFunction(cellType);
             setupNodeAttributesDefaultValues(cellType);
         });
+        // Custom Null Dependency
+        // createAddElementFunction();
         _.forEach(metamodel.containerLinks, function (cellType) {
             attachShapeObject(cellType, metamodel, 'containerLink');
             createIsCellFunctions(cellType);
@@ -149,7 +151,12 @@ istar.setupMetamodel = function (metamodel) {
         //attach to the individual Cell Type definition the shape object that is used to create its view
         if (cellType.name) {
             if ((!cellType.shapeObject) && metamodel.shapesObject) {
-                cellType.shapeObject = metamodel.shapesObject[cellType.name];
+                if (cellType.name === 'To-Be-Refined') {
+                    cellType.shapeObject = metamodel.shapesObject['ToBeRefined']
+                }
+                else {
+                    cellType.shapeObject = metamodel.shapesObject[cellType.name];
+                }
             }
             if (!cellType.shapeObject) {
                 //if no shape is defined, add a default shape, otherwise functions based on visual attributes will fail
@@ -190,9 +197,15 @@ istar.setupMetamodel = function (metamodel) {
         //creates an 'add' function that can be used to create instances of this type
         //Example: if the cellType is Actor, an addActor() function will be created
         if (elementType.name) {
-            istar['add' + elementType.name] = function (content, options) {
-                return istar.base.addNode(elementType, content, options);
-            };
+            if (elementType.name === 'To-Be-Refined') {
+                istar['addToBeRefined'] = function (content, options) {
+                    return istar.base.addNode(elementType, content, options);
+                };
+            } else {
+                istar['add' + elementType.name] = function (content, options) {
+                    return istar.base.addNode(elementType, content, options);
+                };
+            }
         }
     }
 

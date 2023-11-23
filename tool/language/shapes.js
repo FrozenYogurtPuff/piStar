@@ -243,6 +243,40 @@ joint.shapes.istar.Quality = joint.shapes.basic.Path.extend({
     }, joint.shapes.basic.Path.prototype.defaults)
 });
 
+joint.shapes.istar.ToBeRefined = joint.shapes.basic.Rect.extend({
+    markup: '<g class="scalable"><rect class="element"/></g><text class="stereotype"/><text class="content"/>',
+    defaults: joint.util.deepSupplement({
+        size: {width: 90, height: 55},
+        attrs: {
+            '.element': {
+                fill: 'rgb(255,255,255)',
+                height: 30,
+                rx: 0,
+                stroke: 'black',
+                'stroke-dasharray': '8, 4',
+                'stroke-width': 2,
+                'vector-effect': 'non-scaling-stroke', /* prevents stroke distortion when the element is resized */
+                width: 130
+            },
+            '.stereotype': {
+                'font-size': 12,
+                'font-style': 'italic',
+                'ref': '.element',
+                'ref-y': '10',
+                'text': ' '
+            },
+            '.content': {
+                'font-size': 12,
+                'font-weight': 'bold',
+                'ref': '.element',
+                'ref-y': '0',
+                'refY2': '0.5',
+                text: ''
+            }
+        }
+    }, joint.shapes.basic.Rect.prototype.defaults)
+});
+
 joint.shapes.istar.ParticipatesInLink = joint.dia.Link.define('ParticipatesInLink',
     {
         attrs: {

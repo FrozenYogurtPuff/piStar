@@ -78,6 +78,11 @@ istar.metamodel = {
             "canBeInnerElement": true,
             "canBeDependum": true,
             "canBeOnPaper": false
+        },
+        "To-Be-Refined": {
+            "canBeInnerElement": true,
+            "canBeDependum": true,
+            "canBeOnPaper": false
         }
     },
 
